@@ -3,16 +3,18 @@ import {Link} from 'react-router-dom'
 
 interface FactConfig {
     _id: number,
-    media?: string,
-    fact: string,
-    animal: string
+    animal: string,
+    source: string,
+    text: string,
+    media: string,
+    wiki: string,
 }
 
 const Fact = ({fact}: { fact: FactConfig }) => {
 	return (
 		<Card className="my-3 p-3 rounded">
 			<Link to={`fact/${fact._id}`}>
-                <Card.Img src={fact.media || "https://placehold.co/400"} variant="top"/>
+                <Card.Img src={fact.media} variant="top"/>
             </Link>
 
             <Card.Body>
@@ -24,7 +26,7 @@ const Fact = ({fact}: { fact: FactConfig }) => {
             </Card.Body>
 
             <Card.Text as="h3">
-                {fact.fact}
+                {fact.text}
             </Card.Text>
 		</Card>
 	);
