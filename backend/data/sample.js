@@ -1,4 +1,4 @@
-[
+const sampleFacts = [
     {
       "_id": 1,
       "animal": "acorn woodpecker",
@@ -1336,3 +1336,5 @@
       "wiki": "/wiki/Xoloitzcuintle"
     }
   ]
+
+  export default sampleFacts
