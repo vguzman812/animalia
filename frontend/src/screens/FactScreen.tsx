@@ -2,21 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Row, Col, Image, ListGroup } from "react-bootstrap";
 import axios from "axios";
-
-interface Fact {
-	_id: number;
-	animal: string;
-	source: string;
-	text: string;
-	media: string;
-	wiki: string;
-}
+import FactType from "../types/factType";
 
 const FactScreen = () => {
-	console.log("Hello from FactScreen");
 	const { id } = useParams();
 
-    const [singleFact, setSingleFact] = useState<Fact>({
+    const [singleFact, setSingleFact] = useState<FactType>({
         _id: 0,
         animal: "",
         source: "",
@@ -26,10 +17,8 @@ const FactScreen = () => {
       });
 
 	useEffect(() => {
-		console.log("hello from useEffect");
 		const fetchFact = async () => {
-			const { data } = await axios.get<Fact>(`/api/facts/${id}`);
-			console.log(data);
+			const { data } = await axios.get<FactType>(`/api/facts/${id}`);
 			setSingleFact(data);
 		};
 

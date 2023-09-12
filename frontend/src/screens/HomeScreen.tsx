@@ -2,25 +2,14 @@ import { useEffect, useState } from "react";
 import { Row, Col } from "react-bootstrap";
 import FactCard from "../components/FactCard.js";
 import axios from "axios"
-
-
-interface Fact {
-    _id: number;
-    animal: string;
-    source: string;
-    text: string;
-    media: string;
-    wiki: string;
-  }
+import FactType from "../types/factType.js"
   
 const HomeScreen = () => {
-	console.log("Hello from HomeScreen")
-
-	const [facts, setFacts] = useState<Fact[]>([]);
+	const [facts, setFacts] = useState<FactType[]>([]);
 
 	useEffect(() => {
 		const fetchFacts = async () => {
-			const { data } = await axios.get<Fact[]>("/api/facts");
+			const { data } = await axios.get<FactType[]>("/api/facts");
 			setFacts(data);
 		};
 

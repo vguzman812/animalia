@@ -1,16 +1,9 @@
 import Card from "react-bootstrap/Card";
 import {Link} from 'react-router-dom'
+import FactType from "../types/factType";
 
-interface FactConfig {
-    _id: number,
-    animal: string,
-    source: string,
-    text: string,
-    media: string,
-    wiki: string,
-}
 
-const FactCard = ({fact}: { fact: FactConfig }) => {
+const FactCard = ({fact}: { fact: FactType }) => {
 	return (
 		<Card className="my-3 p-3 rounded">
 			<Link to={`fact/${fact._id}`}>
