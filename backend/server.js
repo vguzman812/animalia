@@ -10,17 +10,17 @@ connectDb()
 const app = Express()
 
 app.get("/", (req, res) =>{
-    console.log("Hello from index")
+    console.log("Hello from /")
     res.send("API running")
 })
 
 app.get("/api/facts", (req, res) => {
-    console.log("hello from get facts")
+    console.log("hello from /api/facts")
     res.json(sampleFacts);
 })
 
 app.get("/api/facts/:id", (req, res) => {
-    console.log("Hello from one fact")
+    console.log("Hello from /facts/:id")
     const fact = sampleFacts.find((f) => f._id === Number(req.params.id))
     res.json(fact)
 })

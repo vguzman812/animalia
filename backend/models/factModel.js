@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import User from "./userModel.js"
 
 const factSchema = new mongoose.Schema({
     user: {

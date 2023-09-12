@@ -1,28 +1,31 @@
 {
-  "name": "animalapi",
-  "version": "1.0.0",
-  "description": "A CRUD app for animal facts scraped from the web.",
-  "type": "module",
-  "main": "server.js",
-  "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "nodemon backend/server.js",
-    "start": "node backend/server.js",
-    "client": "npm run dev --prefix frontend"
-  },
-  "author": "Vincent Guzman",
-  "license": "MIT",
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "helmet": "^7.0.0",
-    "mongodb": "^6.0.0",
-    "mongoose": "^7.5.1"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.1",
-    "nodemon": "^3.0.1"
-  }
+	"name": "animalapi",
+	"version": "1.0.0",
+	"description": "A CRUD app for animal facts scraped from the web.",
+	"type": "module",
+	"main": "server.js",
+	"scripts": {
+		"dev": "concurrently \"npm run server\" \"npm run client\"",
+		"server": "nodemon backend/server.js",
+		"start": "node backend/server.js",
+		"client": "npm run dev --prefix frontend",
+		"data:import": "node backend/seeder.js",
+		"data:destroy": "node backend/seeder.js -D"
+	},
+	"author": "Vincent Guzman",
+	"license": "MIT",
+	"dependencies": {
+		"bcryptjs": "^2.4.3",
+		"colors": "^1.4.0",
+		"cors": "^2.8.5",
+		"dotenv": "^16.3.1",
+		"express": "^4.18.2",
+		"helmet": "^7.0.0",
+		"mongodb": "^6.0.0",
+		"mongoose": "^7.5.1"
+	},
+	"devDependencies": {
+		"concurrently": "^8.2.1",
+		"nodemon": "^3.0.1"
+	}
 }
