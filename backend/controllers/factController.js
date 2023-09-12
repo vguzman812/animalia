@@ -25,7 +25,7 @@ const getFactById = asyncHandler(async (req, res) => {
 		res.json(fact);
 	} else {
 		res.status(404);
-		throw new Error("Resource not found.");
+		throw new Error("Resource not found."); 
 	}
 });
 

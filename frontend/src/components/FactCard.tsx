@@ -10,7 +10,7 @@ interface FactConfig {
     wiki: string,
 }
 
-const Fact = ({fact}: { fact: FactConfig }) => {
+const FactCard = ({fact}: { fact: FactConfig }) => {
 	return (
 		<Card className="my-3 p-3 rounded">
 			<Link to={`fact/${fact._id}`}>
@@ -32,4 +32,4 @@ const Fact = ({fact}: { fact: FactConfig }) => {
 	);
 };
 
-export default Fact;
+export default FactCard;

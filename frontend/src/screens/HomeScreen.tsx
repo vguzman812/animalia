@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Row, Col } from "react-bootstrap";
-import Fact from "../components/Fact.js";
+import FactCard from "../components/FactCard.js";
 import axios from "axios"
 
 
@@ -14,6 +14,7 @@ interface Fact {
   }
   
 const HomeScreen = () => {
+	console.log("Hello from HomeScreen")
 
 	const [facts, setFacts] = useState<Fact[]>([]);
 
@@ -32,7 +33,7 @@ const HomeScreen = () => {
 				{facts.map((fact) => {
 					return (
 						<Col sm={12} md={6} lg={4} xl={3} key={fact._id}>
-							<Fact fact={fact} />
+							<FactCard fact={fact} />
 						</Col>
 					);
 				})}

@@ -4,8 +4,8 @@ import { getFactById, getFacts } from "../controllers/factController.js";
 
 const router = express.Router();
 
-router.route("/").get(getFacts)
+router.route("/").get(getFacts);
 
-router.route("/:id").getFactById
+router.route("/:id").get(getFactById);
 
 export default router;
