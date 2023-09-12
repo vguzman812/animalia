@@ -18,7 +18,8 @@ router.get("/:id", asyncHandler(async (req, res) => {
     if (fact) {
         res.json(fact)
     } else {
-        res.status(404).json({ message: "fact not found." })
+        res.status(404)
+        throw new Error('Resource not found.')
     }
 }));
 
