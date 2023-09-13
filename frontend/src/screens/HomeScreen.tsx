@@ -1,31 +1,42 @@
-import { useEffect, useState } from "react";
 import { Row, Col } from "react-bootstrap";
-import FactCard from "../components/FactCard.js";
-import axios from "axios"
-import FactType from "../types/factType.js"
-  
+import FactCard from "../components/FactCard";
+import { useGetFactsQuery } from "../slices/factsApiSlice";
+import FactType from "../types/factType";
+
 const HomeScreen = () => {
-	const [facts, setFacts] = useState<FactType[]>([]);
+	const {
+		data: facts,
+		isLoading,
+		error,
+	} = useGetFactsQuery() as {
+		data: FactType[];
+		isLoading: boolean;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		error: any;
+	};
 
-	useEffect(() => {
-		const fetchFacts = async () => {
-			const { data } = await axios.get<FactType[]>("/api/facts");
-			setFacts(data);
-		};
+	if (isLoading) {
+		return <h2>Loading...</h2>;
+	}
 
-        fetchFacts()
-	}, []);
+	if (error) {
+		return <div>{error.data?.message || error.error}</div>;
+	}
+
 	return (
 		<>
 			<h1>Facts</h1>
 			<Row>
-				{facts.map((fact) => {
-					return (
-						<Col sm={12} md={6} lg={4} xl={3} key={fact._id}>
-							<FactCard fact={fact} />
-						</Col>
-					);
-				})}
+				{facts.map((fact) => (
+					<Col
+						sm={12}
+						md={6}
+						lg={4}
+						xl={3}
+						key={fact._id}>
+						<FactCard fact={fact} />
+					</Col>
+				))}
 			</Row>
 		</>
 	);
