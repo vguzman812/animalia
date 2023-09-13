@@ -18,6 +18,7 @@ const Header = () => {
 		try {
 			await logoutApiCall().unwrap();
 			dispatch(logout());
+			localStorage.clear()
 			navigate("/login");
 		} catch (err) {
 			console.log(err);
