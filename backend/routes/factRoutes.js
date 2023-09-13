@@ -1,11 +1,14 @@
 import express from "express";
-import asyncHandler from "../middleware/asyncHandler.js";
-import { getFactById, getFacts } from "../controllers/factController.js";
+import { createFact, getFactById, getFacts, getFactsByUser } from "../controllers/factController.js";
+import {protect} from "../middleware/authMiddleware.js"
 
 const router = express.Router();
 
-router.route("/").get(getFacts);
+router.route("/").get(getFacts).post(protect, createFact);
 
 router.route("/:id").get(getFactById);
+
+router.route("/user/:id").get(getFactsByUser)
+
 
 export default router;
