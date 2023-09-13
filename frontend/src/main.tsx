@@ -16,6 +16,7 @@ import FactScreen from "./screens/FactScreen.tsx";
 import LoginScreen from "./screens/LoginScreen.tsx";
 import RegisterScreen from "./screens/RegisterScreen.tsx";
 import PrivateRoute from "./components/PrivateRoute.tsx";
+import ProfileScreen from "./screens/ProfileScreen.tsx";
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -28,6 +29,7 @@ const router = createBrowserRouter(
 
 			<Route path="" element={<PrivateRoute />}>
 				// put whatever paths you want to be private here
+				<Route path="/profile" element={<ProfileScreen />} />
 			</Route>
 		</Route>
 	)
