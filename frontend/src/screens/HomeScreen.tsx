@@ -1,6 +1,6 @@
 import { Row, Col } from "react-bootstrap";
 import FactCard from "../components/FactCard";
-import { useGetFactsQuery } from "../slices/factsApiSlice";
+import { useGetAllFactsQuery } from "../slices/factsApiSlice";
 import FactType from "../types/factType";
 
 const HomeScreen = () => {
@@ -8,7 +8,7 @@ const HomeScreen = () => {
 		data: facts,
 		isLoading,
 		error,
-	} = useGetFactsQuery() as {
+	} = useGetAllFactsQuery() as {
 		data: FactType[];
 		isLoading: boolean;
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
