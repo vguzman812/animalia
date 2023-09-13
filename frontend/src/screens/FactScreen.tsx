@@ -3,6 +3,7 @@ import { Row, Col, Image, ListGroup } from "react-bootstrap";
 import FactType from "../types/factType";
 import { useGetOneFactQuery } from "../slices/factsApiSlice";
 import Loader from "../components/Loader";
+import Message from "../components/Message";
 
 
 
@@ -25,7 +26,7 @@ const FactScreen = () => {
 	}
 
 	if (error) {
-		return <div>{error.data?.message || error.error}</div>;
+		return <Message variant='danger'>{ error.data?.message || error.error}</Message>;
 	}
 
 	return (

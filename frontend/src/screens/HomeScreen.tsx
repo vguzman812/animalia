@@ -3,6 +3,7 @@ import FactCard from "../components/FactCard";
 import { useGetAllFactsQuery } from "../slices/factsApiSlice";
 import FactType from "../types/factType";
 import Loader from "../components/Loader";
+import Message from "../components/Message";
 
 const HomeScreen = () => {
 	const {
@@ -21,7 +22,7 @@ const HomeScreen = () => {
 	}
 
 	if (error) {
-		return <div>{error.data?.message || error.error}</div>;
+		return <Message variant='danger'>{ error.data?.message || error.error}</Message>;
 	}
 
 	return (
