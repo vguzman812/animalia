@@ -1,7 +1,8 @@
 import Express from "express"
 import 'dotenv/config'
 import connectDb from "./config/db.js";
-import factsRoutes from "./routes/factsRoutes.js"
+import factRoutes from "./routes/factRoutes.js"
+import userRoutes from "./routes/userRoutes.js"
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
 
 const port = process.env.PORT || 8888;
@@ -15,7 +16,9 @@ app.get("/", (req, res) =>{
     res.send("API running")
 })
 
-app.use("/api/facts", factsRoutes)
+app.use("/api/facts", factRoutes)
+app.use("/api/users", userRoutes)
+
 app.use(notFound)
 app.use(errorHandler)
 
