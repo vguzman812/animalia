@@ -17,6 +17,7 @@ import LoginScreen from "./screens/LoginScreen.tsx";
 import RegisterScreen from "./screens/RegisterScreen.tsx";
 import PrivateRoute from "./components/PrivateRoute.tsx";
 import ProfileScreen from "./screens/ProfileScreen.tsx";
+import AdminRoute from "./components/AdminRoute.tsx";
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -30,6 +31,10 @@ const router = createBrowserRouter(
 			<Route path="" element={<PrivateRoute />}>
 				// put whatever paths you want to be private here
 				<Route path="/profile" element={<ProfileScreen />} />
+			</Route>
+			<Route path="" element={<AdminRoute />}>
+				// put whatever paths you want to be admin only here
+				
 			</Route>
 		</Route>
 	)
