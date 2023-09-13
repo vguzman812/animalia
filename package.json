@@ -7,7 +7,6 @@
 	"scripts": {
 		"dev": "concurrently \"npm run server\" \"npm run client\"",
 		"server": "nodemon backend/server.js",
-		"start": "node backend/server.js",
 		"client": "npm run dev --prefix frontend",
 		"data:import": "node backend/seeder.js",
 		"data:destroy": "node backend/seeder.js -D"
