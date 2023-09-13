@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { Row, Col, Image, ListGroup } from "react-bootstrap";
 import FactType from "../types/factType";
 import { useGetOneFactQuery } from "../slices/factsApiSlice";
+import Loader from "../components/Loader";
 
 
 
