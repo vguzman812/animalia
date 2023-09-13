@@ -20,7 +20,7 @@ const FactScreen = () => {
 	};
 
 	if (isLoading) {
-		return <h2>Loading...</h2>;
+		return <Loader/>;
 	}
 
 	if (error) {

@@ -2,6 +2,7 @@ import { Row, Col } from "react-bootstrap";
 import FactCard from "../components/FactCard";
 import { useGetAllFactsQuery } from "../slices/factsApiSlice";
 import FactType from "../types/factType";
+import Loader from "../components/Loader";
 
 const HomeScreen = () => {
 	const {
@@ -16,7 +17,7 @@ const HomeScreen = () => {
 	};
 
 	if (isLoading) {
-		return <h2>Loading...</h2>;
+		return <Loader/>;
 	}
 
 	if (error) {
