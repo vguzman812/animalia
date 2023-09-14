@@ -7,11 +7,15 @@ import Message from "../components/Message";
 import Paginate from "../components/Paginate";
 import FactType from "../types/factType";
 import { Link } from "react-router-dom";
+import FactsCarousel from "../components/FactsCarousel";
 
 const HomeScreen = () => {
 	const { pageNumber, keyword } = useParams();
 
-	const { data, isLoading, error } = useGetAllFactsQuery({ keyword, pageNumber });
+	const { data, isLoading, error } = useGetAllFactsQuery({
+		keyword,
+		pageNumber,
+	});
 	console.log(data);
 
 	if (isLoading) {
@@ -28,7 +32,15 @@ const HomeScreen = () => {
 
 	return (
 		<>
-		{ keyword && <Link to="/" className="btn btn-light mb-4">Go Back</Link>}
+			{!keyword ? (
+				<FactsCarousel />
+			) : (
+				<Link
+					to="/"
+					className="btn btn-light mb-4">
+					Go Back
+				</Link>
+			)}
 			<h1>Facts</h1>
 			<Row>
 				{data.facts.map((fact: FactType) => (
@@ -45,7 +57,7 @@ const HomeScreen = () => {
 			<Paginate
 				pages={data.pages}
 				currentPage={data.page}
-				keyword={keyword ? keyword : ''}
+				keyword={keyword ? keyword : ""}
 			/>
 		</>
 	);
