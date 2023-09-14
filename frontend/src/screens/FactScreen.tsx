@@ -9,6 +9,7 @@ import {
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { toast } from "react-toastify";
+import Meta from "../components/Meta";
 
 const FactScreen = () => {
 	const { id } = useParams<{ id: string }>();
@@ -59,6 +60,7 @@ const FactScreen = () => {
 
 	return (
 		<>
+		<Meta title={singleFact.animal} description={singleFact.text}/>
 			<Link
 				className="btn btn-light my-3"
 				to="/">

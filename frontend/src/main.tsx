@@ -23,6 +23,7 @@ import UserListScreen from "./screens/UserListScreen.tsx";
 import CreateFactScreen from "./screens/CreateFactScreen.tsx";
 import EditFactScreen from "./screens/EditFactScreen.tsx";
 import UserEditScreen from "./screens/UserEditScreen.tsx";
+import {HelmetProvider} from "react-helmet-async"
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -107,8 +108,10 @@ const router = createBrowserRouter(
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
 	<React.StrictMode>
-		<Provider store={store}>
-			<RouterProvider router={router} />
-		</Provider>
+		<HelmetProvider>
+			<Provider store={store}>
+				<RouterProvider router={router} />
+			</Provider>
+		</HelmetProvider>
 	</React.StrictMode>
 );

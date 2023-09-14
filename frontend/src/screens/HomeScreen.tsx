@@ -8,6 +8,7 @@ import Paginate from "../components/Paginate";
 import FactType from "../types/factType";
 import { Link } from "react-router-dom";
 import FactsCarousel from "../components/FactsCarousel";
+import Meta from "../components/Meta";
 
 const HomeScreen = () => {
 	const { pageNumber, keyword } = useParams();
@@ -41,6 +42,7 @@ const HomeScreen = () => {
 					Go Back
 				</Link>
 			)}
+			<Meta/>
 			<h1>Facts</h1>
 			<Row>
 				{data.facts.map((fact: FactType) => (
