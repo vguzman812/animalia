@@ -6,8 +6,9 @@ import CreateFactType from "../types/createFactType";
 export const factsApiSlice = apiSlice.injectEndpoints({
 	endpoints: (builder) => ({
 		getAllFacts: builder.query<FactType[], void>({
-			query: () => ({
+			query: ({pageNumber}) => ({
 				url: FACTS_URL,
+				params: {pageNumber,},
 			}),
 			providesTags: ['Fact'],
 			keepUnusedDataFor: 5,

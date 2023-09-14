@@ -1,35 +1,34 @@
 import { Row, Col } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 import FactCard from "../components/FactCard";
 import { useGetAllFactsQuery } from "../slices/factsApiSlice";
-import FactType from "../types/factType";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 
 const HomeScreen = () => {
-	const {
-		data: facts,
-		isLoading,
-		error,
-	} = useGetAllFactsQuery() as {
-		data: FactType[];
-		isLoading: boolean;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		error: any;
-	};
+
+	const {pageNumber} = useParams()
+
+	const { data, isLoading, error } = useGetAllFactsQuery({pageNumber});
+	console.log(data);
 
 	if (isLoading) {
-		return <Loader/>;
+		return <Loader />;
 	}
 
 	if (error) {
-		return <Message variant='danger'>{ error.data?.message || error.error}</Message>;
+		return (
+			<Message variant="danger">
+				{error.data?.message || error.error}
+			</Message>
+		);
 	}
 
 	return (
 		<>
 			<h1>Facts</h1>
 			<Row>
-				{facts.map((fact) => (
+				{data.facts.map((fact) => (
 					<Col
 						sm={12}
 						md={6}

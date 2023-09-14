@@ -8,8 +8,13 @@ import Fact from "../models/factModel.js";
  */
 const getFacts = asyncHandler(async (req, res) => {
 	console.log("Hello from /api/facts");
-	const facts = await Fact.find({});
-	res.status(200).json(facts);
+	const pageSize = 2;
+	const page = Number(req.query.pageNumber) || 1;
+	const count = await Fact.countDocuments();
+	const facts = await Fact.find({})
+		.limit(pageSize)
+		.skip(pageSize * (page - 1));
+	res.status(200).json({ facts, page, pages: Math.ceil(count / pageSize) });
 });
 
 /**
@@ -148,29 +153,29 @@ const deleteFact = asyncHandler(async (req, res) => {
  * @access      Private
  */
 const likeFact = asyncHandler(async (req, res) => {
-    const fact = await Fact.findById(req.params.id);
+	const fact = await Fact.findById(req.params.id);
 
-    if (fact) {
-        const alreadyLiked = fact.likes.some((likeId) => 
-		likeId.toString() === req.user._id.toString()
-        );
+	if (fact) {
+		const alreadyLiked = fact.likes.some(
+			(likeId) => likeId.toString() === req.user._id.toString()
+		);
 
-        if (alreadyLiked) {
-            // Remove the like
-            fact.likes = fact.likes.filter((likeId) => 
-			likeId.toString() !== req.user._id.toString()
-            );
-        } else {
-            // Add the like
-            fact.likes.push(req.user._id);
-        }
+		if (alreadyLiked) {
+			// Remove the like
+			fact.likes = fact.likes.filter(
+				(likeId) => likeId.toString() !== req.user._id.toString()
+			);
+		} else {
+			// Add the like
+			fact.likes.push(req.user._id);
+		}
 
-        await fact.save();
-        res.status(200).json(fact);
-    } else {
-        res.status(404);
-        throw new Error("Resource not found.");
-    }
+		await fact.save();
+		res.status(200).json(fact);
+	} else {
+		res.status(404);
+		throw new Error("Resource not found.");
+	}
 });
 
 export {

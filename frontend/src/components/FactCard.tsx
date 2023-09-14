@@ -11,6 +11,7 @@ const FactCard = ({fact}: { fact: FactType }) => {
             </Link>
 
             <Card.Body>
+                <span>{fact.likes.length} likes</span>
                 <Link to={`fact/${fact._id}`}>
                     <Card.Title as="div">
                         <strong>{fact.animal}</strong>
