@@ -34,6 +34,12 @@ export const factsApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: ["Fact"],
 		}),
+		deleteFact: builder.mutation<object, string>({
+			query: (id) => ({
+				url: `${FACTS_URL}/${id}`,
+				method: "DELETE",
+			}),
+		}),
 	}),
 });
 
@@ -42,4 +48,5 @@ export const {
 	useGetOneFactQuery,
 	useCreateFactMutation,
 	useUpdateFactMutation,
+	useDeleteFactMutation,
 } = factsApiSlice;

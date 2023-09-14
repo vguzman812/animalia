@@ -4,6 +4,7 @@ import Message from "../components/Message";
 import Loader from "../components/Loader";
 import {
 	useGetAllFactsQuery,
+	useDeleteFactMutation
 } from "../slices/factsApiSlice";
 import { Link } from "react-router-dom";
 import FactType from "../types/factType";
@@ -15,16 +16,27 @@ const FactListScreen = () => {
 	const {
 		data: facts,
 		isLoading,
+		refetch,
 		error,
 	} = useGetAllFactsQuery() as {
 		data: FactType[];
 		isLoading: boolean;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		error: any;
+		refetch: any;
+		error: object;
 	};
 
-	const deleteHandler = (id: string) => {
-		console.log("delete", id);
+	const [deleteFact, {isLoading: loadingDelete}] = useDeleteFactMutation()
+
+	const deleteHandler = async (id: string) => {
+		if (window.confirm("Are you sure you want to delete this fact?")){
+			try {
+				await deleteFact(id)
+				refetch()
+				toast.success("Fact successfully deleted")
+			} catch (err) {
+				toast.error(err?.data?.message || err.error)
+			}
+		}
 	};
 
 	return (
@@ -41,6 +53,9 @@ const FactListScreen = () => {
 					</Link>
 				</Col>
 			</Row>
+
+			{loadingDelete && <Loader/>
+			}
 			{isLoading ? (
 				<Loader />
 			) : error ? (

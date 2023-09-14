@@ -102,9 +102,9 @@ const updateFact = asyncHandler(async (req, res) => {
 		fact.media = media || fact.media;
 		fact.wiki = wiki || fact.wiki;
 
-		console.log("trying to save updated fact")
+		console.log("trying to save updated fact");
 		const updatedFact = await fact.save();
-		console.log("displaying updated fact")
+		console.log("displaying updated fact");
 		console.log(updatedFact);
 
 		res.status(200).json(updatedFact);
@@ -113,5 +113,40 @@ const updateFact = asyncHandler(async (req, res) => {
 		throw new Error("Resource not found.");
 	}
 });
+/**
+ * @description Delete one fact
+ * @route       DELETE /api/facts/:id
+ * @access      Private
+ */
+const deleteFact = asyncHandler(async (req, res) => {
+	console.log(`Hello from /facts/:id delete. id is: ${req.params.id}`);
 
-export { getFactById, getFacts, createFact, getFactsByUser, updateFact };
+	const fact = await Fact.findById(req.params.id);
+
+	if (fact) {
+		// Check if the fact belongs to the user making the request
+		if (fact.user.toString() !== req.user._id.toString()) {
+			res.status(401);
+			throw new Error("User not authorized to delete this fact");
+		}
+
+		await Fact.deleteOne({ _id: fact._id }).catch((err) => {
+			res.status(500);
+			throw new Error("Internal Server Error");
+		});
+
+		res.status(200).json({ message: "Fact deleted." });
+	} else {
+		res.status(404);
+		throw new Error("Resource not found.");
+	}
+});
+
+export {
+	getFactById,
+	getFacts,
+	createFact,
+	getFactsByUser,
+	updateFact,
+	deleteFact,
+};

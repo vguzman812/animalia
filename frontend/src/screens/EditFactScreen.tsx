@@ -24,7 +24,12 @@ const EditFactScreen = () => {
 
 	const { id: factId } = useParams<{ id: string }>();
 
-	const { data: fact, isLoading, error } = useGetOneFactQuery(factId);
+	const {
+		data: fact,
+		isLoading,
+		refetch,
+		error,
+	} = useGetOneFactQuery(factId);
 	console.log(fact);
 
 	const { userInfo } = useSelector((state) => state.auth);
@@ -62,12 +67,13 @@ const EditFactScreen = () => {
 					text,
 					media,
 					wiki,
-				};
+				}
 				const result = await updateFact(updatedFact).unwrap();
-				if (result.error) {
-					toast.error(result.error);
+				if (result.error){
+					toast.error(result.error)
 				} else {
-					toast.success("Product updated");
+					toast.success('Product updated')
+					refetch()
 					navigate(`/fact/${factId}`);
 				}
 			} catch (err) {

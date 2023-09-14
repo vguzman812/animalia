@@ -1,6 +1,7 @@
 import express from "express";
 import {
 	createFact,
+	deleteFact,
 	getFactById,
 	getFacts,
 	getFactsByUser,
@@ -12,7 +13,7 @@ const router = express.Router();
 
 router.route("/").get(getFacts);
 
-router.route("/:id").get(getFactById).put(protect, updateFact);
+router.route("/:id").get(getFactById).put(protect, updateFact).delete(protect, deleteFact);
 
 router.route("/user/:id").get(getFactsByUser);
 
