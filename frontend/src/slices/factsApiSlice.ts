@@ -9,6 +9,7 @@ export const factsApiSlice = apiSlice.injectEndpoints({
 			query: () => ({
 				url: FACTS_URL,
 			}),
+			providesTags: ['Fact'],
 			keepUnusedDataFor: 5,
 		}),
 		getOneFact: builder.query<FactType, string>({
@@ -25,7 +26,7 @@ export const factsApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: ["Fact"],
 		}),
-		editFact: builder.mutation<FactType, FactType>({
+		updateFact: builder.mutation<FactType, FactType>({
 			query: (data) => ({
 				url: `${FACTS_URL}/${data._id}`,
 				method: "PUT",
@@ -40,5 +41,5 @@ export const {
 	useGetAllFactsQuery,
 	useGetOneFactQuery,
 	useCreateFactMutation,
-	useEditFactMutation,
+	useUpdateFactMutation,
 } = factsApiSlice;

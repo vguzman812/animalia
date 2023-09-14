@@ -82,7 +82,7 @@ const getFactsByUser = asyncHandler(async (req, res) => {
  * @route       PUT /api/facts/:id
  * @access      Private
  */
-const editFact = asyncHandler(async (req, res) => {
+const updateFact = asyncHandler(async (req, res) => {
 	console.log(`Hello from /facts/:id/edit. id is: ${req.params.id}`);
 	const { animal, source, text, media, wiki } = req.body;
 
@@ -96,13 +96,16 @@ const editFact = asyncHandler(async (req, res) => {
 		}
 
 		// Update fields
-		fact.animal = animal;
-		fact.source = source;
-		fact.text = text;
-		fact.media = media;
-		fact.wiki = wiki;
+		fact.animal = animal || fact.animal;
+		fact.source = source || fact.source;
+		fact.text = text || fact.text;
+		fact.media = media || fact.media;
+		fact.wiki = wiki || fact.wiki;
 
+		console.log("trying to save updated fact")
 		const updatedFact = await fact.save();
+		console.log("displaying updated fact")
+		console.log(updatedFact);
 
 		res.status(200).json(updatedFact);
 	} else {
@@ -111,4 +114,4 @@ const editFact = asyncHandler(async (req, res) => {
 	}
 });
 
-export { getFactById, getFacts, createFact, getFactsByUser, editFact };
+export { getFactById, getFacts, createFact, getFactsByUser, updateFact };
