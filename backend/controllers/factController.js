@@ -7,7 +7,6 @@ import Fact from "../models/factModel.js";
  * @access      Public
  */
 const getFacts = asyncHandler(async (req, res) => {
-	console.log("Hello from /api/facts");
 	const pageSize = 12;
 	const page = Number(req.query.pageNumber) || 1;
 	const keyword = req.query.keyword
@@ -32,8 +31,6 @@ const getFacts = asyncHandler(async (req, res) => {
  * @access      Public
  */
 const getFactById = asyncHandler(async (req, res) => {
-	console.log(`Hello from /facts/:id. id is: ${req.params.id}`);
-
 	const fact = await Fact.findById(req.params.id);
 	if (fact) {
 		res.status(200).json(fact);
@@ -48,9 +45,10 @@ const getFactById = asyncHandler(async (req, res) => {
  * @access      Public
  */
 const getTopFacts = asyncHandler(async (req, res) => {
-	const facts = await Fact.find({}).sort({likes: -1}).limit(3)
+	// Sorting facts by the number of likes in descending order and limiting to top 3
+	const facts = await Fact.find({}).sort({ likes: -1 }).limit(3);
 
-	res.status(200).json(facts)
+	res.status(200).json(facts);
 });
 
 /**
@@ -59,7 +57,6 @@ const getTopFacts = asyncHandler(async (req, res) => {
  * @access      Private
  */
 const createFact = asyncHandler(async (req, res) => {
-	console.log(`Hello from /facts/create create fact`);
 	const { animal, source, text, media, wiki } = req.body;
 
 	// Assuming that req.user._id is available (i.e., user is authenticated)
@@ -107,13 +104,12 @@ const getFactsByUser = asyncHandler(async (req, res) => {
  * @access      Private
  */
 const updateFact = asyncHandler(async (req, res) => {
-	console.log(`Hello from /facts/:id/edit. id is: ${req.params.id}`);
 	const { animal, source, text, media, wiki } = req.body;
 
 	const fact = await Fact.findById(req.params.id);
 
 	if (fact) {
-		// Check if the fact belongs to the user making the request
+		// Authorization check: Make sure the user owns the fact they are trying to update
 		if (fact.user.toString() !== req.user._id.toString()) {
 			res.status(401);
 			throw new Error("User not authorized to edit this fact");
@@ -126,10 +122,7 @@ const updateFact = asyncHandler(async (req, res) => {
 		fact.media = media || fact.media;
 		fact.wiki = wiki || fact.wiki;
 
-		console.log("trying to save updated fact");
 		const updatedFact = await fact.save();
-		console.log("displaying updated fact");
-		console.log(updatedFact);
 
 		res.status(200).json(updatedFact);
 	} else {
@@ -143,12 +136,10 @@ const updateFact = asyncHandler(async (req, res) => {
  * @access      Private
  */
 const deleteFact = asyncHandler(async (req, res) => {
-	console.log(`Hello from /facts/:id delete. id is: ${req.params.id}`);
-
 	const fact = await Fact.findById(req.params.id);
 
 	if (fact) {
-		// Check if the fact belongs to the user making the request
+		// Authorization check: Make sure the user owns the fact they are trying to delete
 		if (fact.user.toString() !== req.user._id.toString()) {
 			res.status(401);
 			throw new Error("User not authorized to delete this fact");
@@ -175,6 +166,7 @@ const likeFact = asyncHandler(async (req, res) => {
 	const fact = await Fact.findById(req.params.id);
 
 	if (fact) {
+		// Check if the user has already liked this fact
 		const alreadyLiked = fact.likes.some(
 			(likeId) => likeId.toString() === req.user._id.toString()
 		);
@@ -205,5 +197,5 @@ export {
 	updateFact,
 	deleteFact,
 	likeFact,
-	getTopFacts
+	getTopFacts,
 };

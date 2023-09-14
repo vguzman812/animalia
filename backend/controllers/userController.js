@@ -8,7 +8,6 @@ import generateToken from "../utils/generateToken.js";
  * @access      Public
  */
 const authUser = asyncHandler(async (req, res) => {
-	console.log("Hello from /api/users/login");
 	const { email, password } = req.body;
 	const user = await User.findOne({ email });
 	if (user && (await user.matchPassword(password))) {
@@ -31,13 +30,15 @@ const authUser = asyncHandler(async (req, res) => {
  * @access      Public
  */
 const registerUser = asyncHandler(async (req, res) => {
-	console.log("Hello from /api/users register");
 	const { name, email, password } = req.body;
+	// Check for user existence via email
 	const userExists = await User.findOne({ email });
 	if (userExists) {
 		res.status(400);
 		throw new Error("User already exists.");
 	} else {
+		// Create a new user if the email doesn't exist
+
 		const user = await User.create({
 			name,
 			email,
@@ -64,7 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
  * @access      Private
  */
 const logoutUser = asyncHandler(async (req, res) => {
-	console.log("Hello from /api/users/logout");
+	// Clear the JWT cookie
 	res.cookie("jwt", "", {
 		httpOnly: true,
 		expires: new Date(0),
@@ -78,7 +79,6 @@ const logoutUser = asyncHandler(async (req, res) => {
  * @access      Private
  */
 const getUserProfile = asyncHandler(async (req, res) => {
-	console.log("Hello from /api/users/profile get");
 	const user = await User.findById(req.user._id);
 
 	if (user) {
@@ -101,7 +101,6 @@ const getUserProfile = asyncHandler(async (req, res) => {
  * @access      Private
  */
 const updateUserProfile = asyncHandler(async (req, res) => {
-	console.log("Hello from /api/users/profile update");
 	const user = await User.findById(req.user._id);
 
 	if (user) {
@@ -128,10 +127,9 @@ const updateUserProfile = asyncHandler(async (req, res) => {
  * @access      Private/Admin
  */
 const getAllUsers = asyncHandler(async (req, res) => {
-	console.log("Hello from /api/users");
 	const pageSize = 12;
 	const page = Number(req.query.pageNumber) || 1;
-	const count = await User.countDocuments()
+	const count = await User.countDocuments();
 	const users = await User.find({})
 		.limit(pageSize)
 		.skip(pageSize * (page - 1));
@@ -145,7 +143,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
  * @access      Private/Admin
  */
 const getUser = asyncHandler(async (req, res) => {
-	console.log("Hello from /api/users/:id get");
+	// Fetch the user without their password
 	const user = await User.findById(req.params.id).select("-password");
 
 	if (user) {

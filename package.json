@@ -9,7 +9,8 @@
 		"server": "nodemon backend/server.js",
 		"client": "npm run dev --prefix frontend",
 		"data:import": "node backend/seeder.js",
-		"data:destroy": "node backend/seeder.js -D"
+		"data:destroy": "node backend/seeder.js -D",
+		"build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
 	},
 	"author": "Vincent Guzman",
 	"license": "MIT",

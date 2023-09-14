@@ -7,44 +7,60 @@ import User from "./models/userModel.js";
 import Fact from "./models/factModel.js";
 import connectDb from "./config/db.js";
 
+// Connect to the MongoDB database
 connectDb();
 
+// Function to populate the database with sample data
 const importData = async () => {
-    try {
-        await User.deleteMany();
-        await Fact.deleteMany();
+	try {
+		// Delete all existing users and facts
+		await User.deleteMany();
+		await Fact.deleteMany();
 
-        const createdUsers = await User.insertMany(sampleUsers);
-        const adminUser = createdUsers[0]._id;
+		// Insert the sample users into the User collection
+		const createdUsers = await User.insertMany(sampleUsers);
 
-        const createdFacts = sampleFacts.map((fact) => {
-            return { ...fact, user: adminUser };
-        });
+		// Get the admin user ID
+		const adminUser = createdUsers[0]._id;
 
-        await Fact.insertMany(createdFacts);
+		// Map sample facts to include the admin user's ID
+		const createdFacts = sampleFacts.map((fact) => {
+			return { ...fact, user: adminUser };
+		});
 
-        console.log("Data Imported!".green.inverse);
-        process.exit();
-    } catch (error) {
-        console.error(`Error: ${error}`.red.inverse);
-        process.exit(1);
-    }
+		// Insert the mapped facts into the Fact collection
+		await Fact.insertMany(createdFacts);
+
+		// Log a success message
+		console.log("Data Imported!".green.inverse);
+		process.exit();
+	} catch (error) {
+		// Log any errors
+		console.error(`Error: ${error}`.red.inverse);
+		process.exit(1);
+	}
 };
 
+// Function to delete all data from the database
 const destroyData = async () => {
-    try {
-        await User.deleteMany();
-        await Fact.deleteMany();
-        console.log("Data Destroyed!".red.inverse);
-        process.exit();
-    } catch (error) {
-        console.error(`Error: ${error}`.red.inverse);
-        process.exit(1);
-    }
+	try {
+		// Delete all existing users and facts
+		await User.deleteMany();
+		await Fact.deleteMany();
+
+		// Log a success message
+		console.log("Data Destroyed!".red.inverse);
+		process.exit();
+	} catch (error) {
+		// Log any errors
+		console.error(`Error: ${error}`.red.inverse);
+		process.exit(1);
+	}
 };
 
+// Check command-line arguments to determine which function to run
 if (process.argv.includes("-D") || process.argv.includes("-d")) {
-    destroyData();
+	destroyData();
 } else {
-    importData();
+	importData();
 }
