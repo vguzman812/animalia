@@ -81,9 +81,13 @@ const router = createBrowserRouter(
 					element={<UserListScreen />}
 				/>
 				<Route
-				path="/admin/factlist/page/:pageNumber"
-				element={<FactListScreen />}
-			/>
+					path="/admin/factlist/page/:pageNumber"
+					element={<FactListScreen />}
+				/>
+				<Route
+					path="/admin/userlist/page/:pageNumber"
+					element={<UserListScreen />}
+				/>
 				<Route
 					path="/admin/user/:id/edit"
 					element={<UserEditScreen />}

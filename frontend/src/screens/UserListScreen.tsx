@@ -45,14 +45,17 @@ const UserListScreen = () => {
 					{data ? ( // Check if users are available
 						<>
 							<UserTable
-								users={data}
+								users={data.users}
 								deleteHandler={deleteHandler}
 							/>
 							<Paginate
 								pages={data.pages}
 								currentPage={data.page}
 								facts={false}
+								isAdmin={true}
 							/>
+												<p>{JSON.stringify(data.page)}</p>
+
 						</>
 					) : (
 						<Message variant="info">No users found.</Message>

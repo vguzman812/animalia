@@ -35,7 +35,6 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 			query: ({pageNumber}) => ({
 				url: `${USERS_URL}`,
 				params: {pageNumber},
-				method: "GET",
 			}),
 			providesTags: ["User"],
 			keepUnusedDataFor: 5,

@@ -61,7 +61,9 @@ const FactListScreen = () => {
 					<Paginate
 						pages={data.pages}
 						currentPage={data.page}
+						isAdmin={true}
 					/>
+					<p>{JSON.stringify(data)}</p>
 				</>
 			)}
 		</>
