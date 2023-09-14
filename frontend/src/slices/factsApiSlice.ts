@@ -20,6 +20,12 @@ export const factsApiSlice = apiSlice.injectEndpoints({
 			}),
 			keepUnusedDataFor: 5,
 		}),
+		getTopFacts: builder.query<AllFactsType, void>({
+			query: () => ({
+				url: `${FACTS_URL}/top`,
+			}),
+			keepUnusedDataFor: 5,
+		}),
 		createFact: builder.mutation<FactType, CreateFactType>({
 			query: (data) => ({
 				url: `${FACTS_URL}/create`,
@@ -59,4 +65,5 @@ export const {
 	useUpdateFactMutation,
 	useDeleteFactMutation,
 	useLikeFactMutation,
+	useGetTopFactsQuery
 } = factsApiSlice;
