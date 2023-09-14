@@ -4,7 +4,12 @@ import { FaTimes, FaEdit, FaTrash, FaCheck } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 type UserTableProps = {
-	users: [];
+	users: {
+		_id: string,
+		name: string,
+		email: string,
+		isAdmin: boolean,
+	  }[];
 	deleteHandler: (id: string) => void; // Function prop for handling deletes
 };
 const UserTable = ({ users, deleteHandler }: UserTableProps) => {

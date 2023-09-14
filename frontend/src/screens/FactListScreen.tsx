@@ -14,10 +14,10 @@ import Paginate from "../components/Paginate";
 import { useSelector } from "react-redux";
 
 const FactListScreen = () => {
-	const {pageNumber} = useParams()
-console.log(pageNumber)
-	const { data, isLoading, refetch, error } = useGetAllFactsQuery({pageNumber});
-console.log(data);
+	const { pageNumber } = useParams();
+	const { data, isLoading, refetch, error } = useGetAllFactsQuery({
+		pageNumber,
+	});
 	const [deleteFact, { isLoading: loadingDelete }] = useDeleteFactMutation();
 
 	const deleteHandler = async (id: string) => {
@@ -59,9 +59,9 @@ console.log(data);
 						deleteHandler={deleteHandler}
 					/>
 					<Paginate
-				pages={data.pages}
-				currentPage={data.page}
-			/>
+						pages={data.pages}
+						currentPage={data.page}
+					/>
 				</>
 			)}
 		</>
