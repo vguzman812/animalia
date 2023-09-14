@@ -5,6 +5,7 @@ import {
 	getFactById,
 	getFacts,
 	getFactsByUser,
+	likeFact,
 	updateFact,
 } from "../controllers/factController.js";
 import { protect } from "../middleware/authMiddleware.js";
@@ -13,10 +14,16 @@ const router = express.Router();
 
 router.route("/").get(getFacts);
 
-router.route("/:id").get(getFactById).put(protect, updateFact).delete(protect, deleteFact);
+router.route("/create").post(protect, createFact);
+
+router
+	.route("/:id")
+	.get(getFactById)
+	.put(protect, updateFact)
+	.delete(protect, deleteFact);
+
+router.route("/:id/like").post(protect, likeFact);
 
 router.route("/user/:id").get(getFactsByUser);
-
-router.route("/create").post(protect, createFact);
 
 export default router;

@@ -40,6 +40,13 @@ export const factsApiSlice = apiSlice.injectEndpoints({
 				method: "DELETE",
 			}),
 		}),
+		likeFact: builder.mutation<FactType, string>({
+			query: (id) => ({
+				url: `${FACTS_URL}/${id}/like`, 
+				method: "POST",
+			}),
+			invalidatesTags: ["Fact"],
+		}),
 	}),
 });
 
@@ -49,4 +56,5 @@ export const {
 	useCreateFactMutation,
 	useUpdateFactMutation,
 	useDeleteFactMutation,
+	useLikeFactMutation,
 } = factsApiSlice;

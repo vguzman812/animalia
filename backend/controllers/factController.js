@@ -142,6 +142,37 @@ const deleteFact = asyncHandler(async (req, res) => {
 	}
 });
 
+/**
+ * @description Like/Unlike a fact
+ * @route       POST /api/facts/:id/like
+ * @access      Private
+ */
+const likeFact = asyncHandler(async (req, res) => {
+    const fact = await Fact.findById(req.params.id);
+
+    if (fact) {
+        const alreadyLiked = fact.likes.some((likeId) => 
+		likeId.toString() === req.user._id.toString()
+        );
+
+        if (alreadyLiked) {
+            // Remove the like
+            fact.likes = fact.likes.filter((likeId) => 
+			likeId.toString() !== req.user._id.toString()
+            );
+        } else {
+            // Add the like
+            fact.likes.push(req.user._id);
+        }
+
+        await fact.save();
+        res.status(200).json(fact);
+    } else {
+        res.status(404);
+        throw new Error("Resource not found.");
+    }
+});
+
 export {
 	getFactById,
 	getFacts,
@@ -149,4 +180,5 @@ export {
 	getFactsByUser,
 	updateFact,
 	deleteFact,
+	likeFact,
 };

@@ -6,6 +6,7 @@ interface FactType {
     text: string,
     media?: string,
     wiki?: string,
+    likes?: string[]
 }
 
 export default FactType
