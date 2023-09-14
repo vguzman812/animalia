@@ -43,6 +43,7 @@ const HomeScreen = () => {
 			<Paginate
 				pages={data.pages}
 				currentPage={data.page}
+				keyword={keyword ? keyword : ''}
 			/>
 		</>
 	);
