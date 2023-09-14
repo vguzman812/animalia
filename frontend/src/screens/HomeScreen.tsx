@@ -6,6 +6,7 @@ import Loader from "../components/Loader";
 import Message from "../components/Message";
 import Paginate from "../components/Paginate";
 import FactType from "../types/factType";
+import { Link } from "react-router-dom";
 
 const HomeScreen = () => {
 	const { pageNumber, keyword } = useParams();
@@ -27,6 +28,7 @@ const HomeScreen = () => {
 
 	return (
 		<>
+		{ keyword && <Link to="/" className="btn btn-light mb-4">Go Back</Link>}
 			<h1>Facts</h1>
 			<Row>
 				{data.facts.map((fact: FactType) => (

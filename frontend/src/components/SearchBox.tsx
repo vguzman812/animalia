@@ -10,8 +10,10 @@ const SearchBox = () => {
     const submitHandler = async (e) =>{
         e.preventDefault()
         if (keyword.trim()){
+			setKeyword('')
             navigate(`/search/${keyword}`)
         } else {
+			setKeyword('')
             navigate("/")
         }
     }
@@ -29,7 +31,7 @@ const SearchBox = () => {
 				className="mr-sm-2 ml-sm-5"></Form.Control>
 			<Button
 				type="submit"
-				variant="outline-success"
+				variant="outline-light"
 				className="p-2 mx-2">
 				Search
 			</Button>
