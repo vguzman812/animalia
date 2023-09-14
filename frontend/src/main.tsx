@@ -22,6 +22,7 @@ import FactListScreen from "./screens/FactListScreen.tsx";
 import UserListScreen from "./screens/UserListScreen.tsx";
 import CreateFactScreen from "./screens/CreateFactScreen.tsx";
 import EditFactScreen from "./screens/EditFactScreen.tsx";
+import UserEditScreen from "./screens/UserEditScreen.tsx";
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -74,6 +75,10 @@ const router = createBrowserRouter(
 				<Route
 					path="/admin/userlist"
 					element={<UserListScreen />}
+				/>
+				<Route
+					path="/admin/user/:id/edit"
+					element={<UserEditScreen />}
 				/>
 			</Route>
 		</Route>
