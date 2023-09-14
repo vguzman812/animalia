@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 
 const UserListScreen = () => {
 	const { data: users, refetch, isLoading, error } = useGetAllUsersQuery();
+	console.log(error)
 	const [deleteUser, { isloading: loadingDelete }] = useDeleteUserMutation();
 
 	const deleteHandler = async (id) => {
@@ -33,7 +34,7 @@ const UserListScreen = () => {
 			{isLoading ? (
 				<Loader />
 			) : error ? (
-				<Message variant="danger">{error}</Message>
+				<Message variant="danger">{error?.data?.message}</Message>
 			) : (
 				<UserTable
 					users={users}

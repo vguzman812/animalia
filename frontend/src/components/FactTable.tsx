@@ -4,6 +4,8 @@ import { FaTimes, FaEdit, FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Loader from "../components/Loader";
 import FactType from "../types/factType";
+import AllFactsType from "../types/allFactsType";
+
 
 
 type FactTableProps = {

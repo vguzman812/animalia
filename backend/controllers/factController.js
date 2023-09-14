@@ -8,7 +8,7 @@ import Fact from "../models/factModel.js";
  */
 const getFacts = asyncHandler(async (req, res) => {
 	console.log("Hello from /api/facts");
-	const pageSize = 2;
+	const pageSize = 12;
 	const page = Number(req.query.pageNumber) || 1;
 	const count = await Fact.countDocuments();
 	const facts = await Fact.find({})

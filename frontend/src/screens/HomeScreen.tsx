@@ -4,12 +4,13 @@ import FactCard from "../components/FactCard";
 import { useGetAllFactsQuery } from "../slices/factsApiSlice";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
+import Paginate from "../components/Paginate";
+import FactType from "../types/factType";
 
 const HomeScreen = () => {
+	const { pageNumber } = useParams();
 
-	const {pageNumber} = useParams()
-
-	const { data, isLoading, error } = useGetAllFactsQuery({pageNumber});
+	const { data, isLoading, error } = useGetAllFactsQuery({ pageNumber });
 	console.log(data);
 
 	if (isLoading) {
@@ -28,7 +29,7 @@ const HomeScreen = () => {
 		<>
 			<h1>Facts</h1>
 			<Row>
-				{data.facts.map((fact) => (
+				{data.facts.map((fact: FactType) => (
 					<Col
 						sm={12}
 						md={6}
@@ -39,6 +40,10 @@ const HomeScreen = () => {
 					</Col>
 				))}
 			</Row>
+			<Paginate
+				pages={data.pages}
+				currentPage={data.page}
+			/>
 		</>
 	);
 };

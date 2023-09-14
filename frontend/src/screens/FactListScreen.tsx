@@ -4,37 +4,30 @@ import Message from "../components/Message";
 import Loader from "../components/Loader";
 import {
 	useGetAllFactsQuery,
-	useDeleteFactMutation
+	useDeleteFactMutation,
 } from "../slices/factsApiSlice";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import FactType from "../types/factType";
 import { toast } from "react-toastify";
 import FactTable from "../components/FactTable";
-
+import Paginate from "../components/Paginate";
+import { useSelector } from "react-redux";
 
 const FactListScreen = () => {
-	const {
-		data: facts,
-		isLoading,
-		refetch,
-		error,
-	} = useGetAllFactsQuery() as {
-		data: FactType[];
-		isLoading: boolean;
-		refetch: any;
-		error: object;
-	};
-
-	const [deleteFact, {isLoading: loadingDelete}] = useDeleteFactMutation()
+	const {pageNumber} = useParams()
+console.log(pageNumber)
+	const { data, isLoading, refetch, error } = useGetAllFactsQuery({pageNumber});
+console.log(data);
+	const [deleteFact, { isLoading: loadingDelete }] = useDeleteFactMutation();
 
 	const deleteHandler = async (id: string) => {
-		if (window.confirm("Are you sure you want to delete this fact?")){
+		if (window.confirm("Are you sure you want to delete this fact?")) {
 			try {
-				await deleteFact(id)
-				refetch()
-				toast.success("Fact successfully deleted")
+				await deleteFact(id);
+				refetch();
+				toast.success("Fact successfully deleted");
 			} catch (err) {
-				toast.error(err?.data?.message || err.error)
+				toast.error(err?.data?.message || err.error);
 			}
 		}
 	};
@@ -54,17 +47,21 @@ const FactListScreen = () => {
 				</Col>
 			</Row>
 
-			{loadingDelete && <Loader/>
-			}
+			{loadingDelete && <Loader />}
 			{isLoading ? (
 				<Loader />
 			) : error ? (
 				<Message variant="danger">{error}</Message>
 			) : (
 				<>
-					<FactTable 
-					facts={facts}
-					deleteHandler={deleteHandler}/>
+					<FactTable
+						facts={data.facts}
+						deleteHandler={deleteHandler}
+					/>
+					<Paginate
+				pages={data.pages}
+				currentPage={data.page}
+			/>
 				</>
 			)}
 		</>

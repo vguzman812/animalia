@@ -2,10 +2,11 @@ import { FACTS_URL } from "../constants";
 import { apiSlice } from "./apiSlice";
 import FactType from "../types/factType";
 import CreateFactType from "../types/createFactType";
+import AllFactsType from "../types/allFactsType";
 
 export const factsApiSlice = apiSlice.injectEndpoints({
 	endpoints: (builder) => ({
-		getAllFacts: builder.query<FactType[], void>({
+		getAllFacts: builder.query<AllFactsType, void>({
 			query: ({pageNumber}) => ({
 				url: FACTS_URL,
 				params: {pageNumber,},
