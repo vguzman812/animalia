@@ -23,11 +23,11 @@ const factSchema = new mongoose.Schema({
     },
     media: {
         type: String,
-        required: true,
+        required: false,
     },
     wiki: {
         type: String,
-        required: true,
+        required: false,
     },
 }, {
     timestamps: true,

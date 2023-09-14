@@ -20,6 +20,7 @@ import ProfileScreen from "./screens/ProfileScreen.tsx";
 import AdminRoute from "./components/AdminRoute.tsx";
 import FactListScreen from "./screens/FactListScreen.tsx";
 import UserListScreen from "./screens/UserListScreen.tsx";
+import CreateFactScreen from "./screens/CreateFactScreen.tsx";
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -51,6 +52,10 @@ const router = createBrowserRouter(
 				<Route
 					path="/profile"
 					element={<ProfileScreen />}
+				/>
+				<Route
+					path="/fact/create"
+					element={<CreateFactScreen />}
 				/>
 			</Route>
 			<Route

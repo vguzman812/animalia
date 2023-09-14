@@ -9,7 +9,7 @@ import Fact from "../models/factModel.js";
 const getFacts = asyncHandler(async (req, res) => {
 	console.log("Hello from /api/facts");
 	const facts = await Fact.find({});
-	res.json(facts);
+	res.status(200).json(facts);
 });
 
 /**
@@ -22,7 +22,7 @@ const getFactById = asyncHandler(async (req, res) => {
 
 	const fact = await Fact.findById(req.params.id);
 	if (fact) {
-		res.json(fact);
+		res.status(200).json(fact);
 	} else {
 		res.status(404);
 		throw new Error("Resource not found.");
@@ -31,11 +31,11 @@ const getFactById = asyncHandler(async (req, res) => {
 
 /**
  * @description Create fact
- * @route       POST /api/facts
+ * @route       POST /api/facts/create
  * @access      Private
  */
 const createFact = asyncHandler(async (req, res) => {
-	console.log(`Hello from /facts create fact`);
+	console.log(`Hello from /facts/create create fact`);
 	const { animal, source, text, media, wiki } = req.body;
 
 	// Assuming that req.user._id is available (i.e., user is authenticated)
@@ -70,7 +70,7 @@ const getFactsByUser = asyncHandler(async (req, res) => {
 	const facts = await Fact.find({ user: userId });
   
 	if (facts) {
-	  res.json(facts);
+	  res.status(200).json(facts);
 	} else {
 	  res.status(404);
 	  throw new Error('Facts or user not found.');

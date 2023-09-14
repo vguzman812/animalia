@@ -1,6 +1,4 @@
-interface FactType {
-    _id: string,
-    user?: string,
+interface CreateFactType {
     animal: string,
     source: string,
     text: string,
@@ -8,4 +6,4 @@ interface FactType {
     wiki?: string,
 }
 
-export default FactType
+export default CreateFactType

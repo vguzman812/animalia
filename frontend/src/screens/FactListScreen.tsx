@@ -3,9 +3,12 @@ import { Table, Button, Row, Col } from "react-bootstrap";
 import { FaTimes, FaEdit, FaTrash } from "react-icons/fa";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
-import { useGetAllFactsQuery } from "../slices/factsApiSlice";
+import {
+	useGetAllFactsQuery,
+} from "../slices/factsApiSlice";
 import { Link } from "react-router-dom";
 import FactType from "../types/factType";
+import { toast } from "react-toastify";
 
 const FactListScreen = () => {
 	const {
@@ -18,6 +21,7 @@ const FactListScreen = () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		error: any;
 	};
+
 	const deleteHandler = (id: string) => {
 		console.log("delete", id);
 	};
@@ -29,9 +33,11 @@ const FactListScreen = () => {
 					<h1>Facts</h1>
 				</Col>
 				<Col className="text-end">
-					<Button className="btn-sm m-3">
-						<FaEdit /> Edit Fact
-					</Button>
+					<Link to="/fact/create">
+						<Button className="btn-sm m-3">
+							<FaEdit /> Create Fact
+						</Button>
+					</Link>
 				</Col>
 			</Row>
 			{isLoading ? (
@@ -60,14 +66,30 @@ const FactListScreen = () => {
 							{facts.map((fact) => {
 								return (
 									<tr key={fact._id}>
-										<td><Link to={`/fact/${fact._id}`}>{fact._id}</Link></td>
+										<td>
+											<Link to={`/fact/${fact._id}`}>
+												{fact._id}
+											</Link>
+										</td>
 										<td>{fact.animal}</td>
-										<td><Link to={fact.source}>Source</Link></td>
-										<td className="text-wrap">{fact.text}</td>
-                    {fact.media &&(
-										<td><Link to={fact.media}>Media</Link></td>
-                    )}
-										<td><Link to={fact.wiki}>Wikipedia</Link></td>
+										<td>
+											<Link to={fact.source}>Source</Link>
+										</td>
+										<td className="text-wrap">
+											{fact.text}
+										</td>
+										{fact.media && (
+											<td>
+												<Link to={fact.media}>
+													Media
+												</Link>
+											</td>
+										)}
+										<td>
+											<Link to={fact.wiki}>
+												Wikipedia
+											</Link>
+										</td>
 										<td>
 											<LinkContainer
 												to={`/admin/fact/${fact._id}/edit`}>
