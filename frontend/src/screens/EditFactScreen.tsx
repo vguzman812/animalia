@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import FormContainer from "../components/FormContainer";
 import Loader from "../components/Loader";
 import { toast } from "react-toastify";
-import { useCreateFactMutation } from "../slices/factsApiSlice";
+import {
+	useEditFactMutation,
+	useGetOneFactQuery,
+} from "../slices/factsApiSlice";
+import Message from "../components/Message";
 
-const CreateFactScreen = () => {
+const EditFactScreen = () => {
 	const [animal, setAnimal] = useState("");
 	const [source, setSource] = useState("");
 	const [text, setText] = useState("");
@@ -15,16 +19,49 @@ const CreateFactScreen = () => {
 	const [wiki, setWiki] = useState("");
 
 	const navigate = useNavigate();
-    const location = useLocation();
-	const redirect = location.search ? location.search.split('=')[1] : '/';
+	const location = useLocation();
+	const redirect = location.search ? location.search.split("=")[1] : "/";
 
+	const { id } = useParams<{ id: string }>();
 
-	const [createFact, { isLoading, error }] = useCreateFactMutation();
+	const {
+		data: factInfo,
+		isLoading: getFactInfoLoading,
+		error: getFactInfoError,
+	} = useGetOneFactQuery(id);
+
+	const { userInfo } = useSelector((state) => state.auth);
+
+	const [editFact, { isLoading, error }] = useEditFactMutation();
+
+	useEffect(() => {
+		console.log("hello from use Effect edit fact screen");
+		if (factInfo) {
+			setAnimal(factInfo.animal);
+			setSource(factInfo.source);
+			setText(factInfo.text);
+			setMedia(factInfo.media);
+			setWiki(factInfo.wiki);
+		}
+	}, [factInfo]);
+
+    if (getFactInfoLoading) {
+		return <Loader/>;
+	}
+
+	if (getFactInfoError) {
+		return <Message variant='danger'>{ getFactInfoError.data?.message || getFactInfoError.error}</Message>;
+	}
 
 	const submitHandler = async (e) => {
 		e.preventDefault();
+		if (!animal || !source || !text || !media || !wiki) {
+			toast.error("Please fill in all required fields.");
+			return;
+		}
 		try {
-			await createFact({
+			await editFact({
+				user: userInfo._id,
 				animal,
 				source,
 				text,
@@ -33,13 +70,13 @@ const CreateFactScreen = () => {
 			}).unwrap();
 			navigate("/");
 		} catch (err) {
-			toast.error(err?.data?.message || err.error);
+			toast.error(err?.data?.message || err.message);
 		}
 	};
 
 	return (
 		<FormContainer>
-			<h1>Create a fact</h1>
+			<h1>Edit this fact</h1>
 			<Form onSubmit={submitHandler}>
 				<Form.Group
 					controlId="animal"
@@ -110,7 +147,7 @@ const CreateFactScreen = () => {
 					variant="primary"
 					className="mt-2"
 					disabled={isLoading}>
-					Create Fact
+					Update Fact
 				</Button>
 				{isLoading && <Loader />}
 			</Form>
@@ -125,4 +162,4 @@ const CreateFactScreen = () => {
 	);
 };
 
-export default CreateFactScreen;
+export default EditFactScreen;

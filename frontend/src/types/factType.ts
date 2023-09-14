@@ -1,5 +1,5 @@
 interface FactType {
-    _id: string,
+    _id?: string,
     user?: string,
     animal: string,
     source: string,

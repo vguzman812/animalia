@@ -25,6 +25,14 @@ export const factsApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: ["Fact"],
 		}),
+		editFact: builder.mutation<FactType, FactType>({
+			query: (data) => ({
+				url: `${FACTS_URL}/${data._id}`,
+				method: "PUT",
+				body: data,
+			}),
+			invalidatesTags: ["Fact"],
+		}),
 	}),
 });
 
@@ -32,4 +40,5 @@ export const {
 	useGetAllFactsQuery,
 	useGetOneFactQuery,
 	useCreateFactMutation,
+	useEditFactMutation,
 } = factsApiSlice;
