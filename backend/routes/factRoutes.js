@@ -5,6 +5,7 @@ import {
 	getFactById,
 	getFacts,
 	getFactsByUser,
+	getTopFacts,
 	likeFact,
 	updateFact,
 } from "../controllers/factController.js";
@@ -15,6 +16,8 @@ const router = express.Router();
 router.route("/").get(getFacts);
 
 router.route("/create").post(protect, createFact);
+
+router.route("/top").get(getTopFacts);
 
 router
 	.route("/:id")

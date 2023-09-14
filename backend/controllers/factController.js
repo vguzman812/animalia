@@ -42,6 +42,16 @@ const getFactById = asyncHandler(async (req, res) => {
 		throw new Error("Resource not found.");
 	}
 });
+/**
+ * @description Get top liked facts
+ * @route       GET /api/facts/top
+ * @access      Public
+ */
+const getTopFacts = asyncHandler(async (req, res) => {
+	const facts = await Fact.find({}).sort({likes: -1}).limit(3)
+
+	res.status(200).json(facts)
+});
 
 /**
  * @description Create fact
@@ -195,4 +205,5 @@ export {
 	updateFact,
 	deleteFact,
 	likeFact,
+	getTopFacts
 };
