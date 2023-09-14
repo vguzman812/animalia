@@ -8,9 +8,9 @@ import Paginate from "../components/Paginate";
 import FactType from "../types/factType";
 
 const HomeScreen = () => {
-	const { pageNumber } = useParams();
+	const { pageNumber, keyword } = useParams();
 
-	const { data, isLoading, error } = useGetAllFactsQuery({ pageNumber });
+	const { data, isLoading, error } = useGetAllFactsQuery({ keyword, pageNumber });
 	console.log(data);
 
 	if (isLoading) {

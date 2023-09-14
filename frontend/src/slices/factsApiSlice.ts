@@ -7,11 +7,11 @@ import AllFactsType from "../types/allFactsType";
 export const factsApiSlice = apiSlice.injectEndpoints({
 	endpoints: (builder) => ({
 		getAllFacts: builder.query<AllFactsType, void>({
-			query: ({pageNumber}) => ({
+			query: ({ keyword, pageNumber }) => ({
 				url: FACTS_URL,
-				params: {pageNumber,},
+				params: { keyword, pageNumber },
 			}),
-			providesTags: ['Fact'],
+			providesTags: ["Fact"],
 			keepUnusedDataFor: 5,
 		}),
 		getOneFact: builder.query<FactType, string>({
@@ -44,7 +44,7 @@ export const factsApiSlice = apiSlice.injectEndpoints({
 		}),
 		likeFact: builder.mutation<FactType, string>({
 			query: (id) => ({
-				url: `${FACTS_URL}/${id}/like`, 
+				url: `${FACTS_URL}/${id}/like`,
 				method: "POST",
 			}),
 			invalidatesTags: ["Fact"],

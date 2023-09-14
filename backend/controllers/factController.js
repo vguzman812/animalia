@@ -10,8 +10,17 @@ const getFacts = asyncHandler(async (req, res) => {
 	console.log("Hello from /api/facts");
 	const pageSize = 12;
 	const page = Number(req.query.pageNumber) || 1;
-	const count = await Fact.countDocuments();
-	const facts = await Fact.find({})
+	const keyword = req.query.keyword
+		? {
+				animal: {
+					$regex: req.query.keyword,
+					$options: "i",
+				},
+		  }
+		: {};
+
+	const count = await Fact.countDocuments({ ...keyword });
+	const facts = await Fact.find({ ...keyword })
 		.limit(pageSize)
 		.skip(pageSize * (page - 1));
 	res.status(200).json({ facts, page, pages: Math.ceil(count / pageSize) });
