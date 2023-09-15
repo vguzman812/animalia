@@ -39,17 +39,12 @@ const Header = () => {
 				collapseOnSelect>
 				<Container>
 					<LinkContainer to="/">
-						<Navbar.Brand>Hello World</Navbar.Brand>
+						<Navbar.Brand>Animal Facts</Navbar.Brand>
 					</LinkContainer>
 					<Navbar.Toggle aria-controls="basic-navbar-nav" />
 					<Navbar.Collapse id="basic-navbar-nav">
 						<Nav className="ms-auto">
 							<SearchBox />
-							<LinkContainer to="/cart">
-								<Nav.Link>
-									<FaShoppingCart /> Cart
-								</Nav.Link>
-							</LinkContainer>
 							{userInfo ? (
 								<NavDropdown
 									title={userInfo.name}
@@ -64,11 +59,18 @@ const Header = () => {
 									</NavDropdown.Item>
 								</NavDropdown>
 							) : (
-								<LinkContainer to="/login">
-									<Nav.Link>
-										<FaUser /> Login
-									</Nav.Link>
-								</LinkContainer>
+								<>
+									<LinkContainer to="/login">
+										<Nav.Link>
+											<FaUser /> Login
+										</Nav.Link>
+									</LinkContainer>
+									<LinkContainer to="/register">
+										<Nav.Link>
+											<FaUser /> Register
+										</Nav.Link>
+									</LinkContainer>
+								</>
 							)}
 							{userInfo && userInfo.isAdmin && (
 								<NavDropdown

@@ -100,6 +100,9 @@ const FactScreen = () => {
 							<a href={singleFact.wiki}>Wikipedia Link</a>
 						</ListGroup.Item>
 						<ListGroup.Item>
+							<a href={singleFact.media}>Media Link</a>
+						</ListGroup.Item>
+						<ListGroup.Item>
 							<h4>{singleFact.likes?.length || 0} Likes</h4>
 							<Button
 								onClick={handleLike}

@@ -5,9 +5,9 @@ import FactType from "../types/factType";
 
 const FactCard = ({fact}: { fact: FactType }) => {
 	return (
-		<Card className="my-3 p-3 rounded">
-			<Link to={`/fact/${fact._id}`}>
-                <Card.Img src={fact.media} variant="top"/>
+		<Card className="my-3 p-3 rounded" style={{ maxHeight: "300px"}}>
+			<Link to={`/fact/${fact._id}`} >
+                <Card.Img src={fact.media || "https://placehold.co/400"} variant="top" alt={fact.animal} className="fact-image"/>
             </Link>
 
             <Card.Body>

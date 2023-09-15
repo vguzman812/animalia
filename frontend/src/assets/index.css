@@ -1,8 +1,25 @@
 .carousel-container {
     height: 50vh;
 }
+.carousel-div {
+    display:flex;
+}
 .carousel-image {
-    max-width: 50%;
+    min-width: 50%;
     object-position: center;
     object-fit: cover;
+    float:left;
+}
+
+.fact-image{
+    min-height: 150px;
+    max-height: 150px;
+    object-fit: cover;
+    object-position: center;;
+}
+.carousel-text {
+    color: white;
+}
+.carousel-text a {
+    text-decoration: none;
 }
