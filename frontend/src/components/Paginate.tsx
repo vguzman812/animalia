@@ -15,7 +15,7 @@ const Paginate = ({
 	return (
 		<>
 			{pages > 1 && (
-				<Pagination>
+				<Pagination size="sm">
 					<LinkContainer
 						to={
 							!isAdmin
