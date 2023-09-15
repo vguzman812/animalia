@@ -1,7 +1,6 @@
 import { Table, Button } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { FaTimes, FaEdit, FaTrash, FaCheck } from "react-icons/fa";
-import { Link } from "react-router-dom";
 
 type UserTableProps = {
 	users: {

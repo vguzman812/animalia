@@ -1,10 +1,22 @@
 import { Outlet, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-
 const PrivateRoute = () => {
-    const {userInfo} = useSelector((state) => state.auth)
-  return userInfo ? <Outlet/> : <Navigate to="/login" replace/>
-}
+	interface RootState {
+		auth: {
+			userInfo: any; // Replace 'any' with the actual type of userInfo. I am too lazy for this rn.
+		};
+	}
+	// Getting the logged-in user's info from Redux store
+	const { userInfo } = useSelector((state: RootState) => state.auth);
+	return userInfo ? (
+		<Outlet />
+	) : (
+		<Navigate
+			to="/login"
+			replace
+		/>
+	);
+};
 
-export default PrivateRoute
+export default PrivateRoute;

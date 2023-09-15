@@ -4,9 +4,11 @@ import FactType from "../types/factType";
 import CreateFactType from "../types/createFactType";
 import AllFactsType from "../types/allFactsType";
 
+// Extend the base apiSlice with additional endpoints related to facts
 export const factsApiSlice = apiSlice.injectEndpoints({
 	endpoints: (builder) => ({
-		getAllFacts: builder.query<AllFactsType, void>({
+		// Query to get all facts based on keyword and pageNumber
+		getAllFacts: builder.query<AllFactsType, any>({
 			query: ({ keyword, pageNumber }) => ({
 				url: FACTS_URL,
 				params: { keyword, pageNumber },
@@ -14,18 +16,17 @@ export const factsApiSlice = apiSlice.injectEndpoints({
 			providesTags: ["Fact"],
 			keepUnusedDataFor: 5,
 		}),
+		// Query to get a single fact by its ID
 		getOneFact: builder.query<FactType, string>({
-			query: (id) => ({
-				url: `${FACTS_URL}/${id}`,
-			}),
+			query: (id) => ({ url: `${FACTS_URL}/${id}` }),
 			keepUnusedDataFor: 5,
 		}),
+		// Query to get the top facts
 		getTopFacts: builder.query<AllFactsType, void>({
-			query: () => ({
-				url: `${FACTS_URL}/top`,
-			}),
+			query: () => ({ url: `${FACTS_URL}/top` }),
 			keepUnusedDataFor: 5,
 		}),
+		// Mutation to create a new fact
 		createFact: builder.mutation<FactType, CreateFactType>({
 			query: (data) => ({
 				url: `${FACTS_URL}/create`,
@@ -34,6 +35,7 @@ export const factsApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: ["Fact"],
 		}),
+		// Mutation to update an existing fact
 		updateFact: builder.mutation<FactType, FactType>({
 			query: (data) => ({
 				url: `${FACTS_URL}/${data._id}`,
@@ -42,12 +44,14 @@ export const factsApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: ["Fact"],
 		}),
+		// Mutation to delete a fact by its ID
 		deleteFact: builder.mutation<object, string>({
 			query: (id) => ({
 				url: `${FACTS_URL}/${id}`,
 				method: "DELETE",
 			}),
 		}),
+		// Mutation to like a fact by its ID
 		likeFact: builder.mutation<FactType, string>({
 			query: (id) => ({
 				url: `${FACTS_URL}/${id}/like`,
@@ -65,5 +69,5 @@ export const {
 	useUpdateFactMutation,
 	useDeleteFactMutation,
 	useLikeFactMutation,
-	useGetTopFactsQuery
+	useGetTopFactsQuery,
 } = factsApiSlice;

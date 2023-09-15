@@ -8,8 +8,13 @@ import { logout } from "../slices/authSlice";
 import SearchBox from "./SearchBox";
 
 const Header = () => {
-	const { userInfo } = useSelector((state) => state.auth);
-
+	interface RootState {
+		auth: {
+			userInfo: any; // Replace 'any' with the actual type of userInfo. I am too lazy for this rn.
+		};
+	}
+	// Getting the logged-in user's info from Redux store
+	const { userInfo } = useSelector((state: RootState) => state.auth);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
@@ -19,7 +24,7 @@ const Header = () => {
 		try {
 			await logoutApiCall().unwrap();
 			dispatch(logout());
-			localStorage.clear()
+			localStorage.clear();
 			navigate("/login");
 		} catch (err) {
 			console.log(err);
@@ -39,7 +44,7 @@ const Header = () => {
 					<Navbar.Toggle aria-controls="basic-navbar-nav" />
 					<Navbar.Collapse id="basic-navbar-nav">
 						<Nav className="ms-auto">
-							<SearchBox/>
+							<SearchBox />
 							<LinkContainer to="/cart">
 								<Nav.Link>
 									<FaShoppingCart /> Cart
@@ -66,12 +71,18 @@ const Header = () => {
 								</LinkContainer>
 							)}
 							{userInfo && userInfo.isAdmin && (
-								<NavDropdown title="Admin Menu" id='adminmenu'>
-									<LinkContainer to='/admin/factlist'>
-										<NavDropdown.Item>Facts</NavDropdown.Item>
+								<NavDropdown
+									title="Admin Menu"
+									id="adminmenu">
+									<LinkContainer to="/admin/factlist">
+										<NavDropdown.Item>
+											Facts
+										</NavDropdown.Item>
 									</LinkContainer>
-									<LinkContainer to='/admin/userlist'>
-										<NavDropdown.Item>Users</NavDropdown.Item>
+									<LinkContainer to="/admin/userlist">
+										<NavDropdown.Item>
+											Users
+										</NavDropdown.Item>
 									</LinkContainer>
 								</NavDropdown>
 							)}

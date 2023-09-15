@@ -7,33 +7,38 @@ import {
 	useDeleteFactMutation,
 } from "../slices/factsApiSlice";
 import { Link, useParams } from "react-router-dom";
-import FactType from "../types/factType";
 import { toast } from "react-toastify";
 import FactTable from "../components/FactTable";
 import Paginate from "../components/Paginate";
-import { useSelector } from "react-redux";
 
 const FactListScreen = () => {
+	// Extract the page number from URL parameters
 	const { pageNumber } = useParams();
+
+	// Fetch all facts from the server
 	const { data, isLoading, refetch, error } = useGetAllFactsQuery({
 		pageNumber,
 	});
+
+	// Hook to handle the delete mutation
 	const [deleteFact, { isLoading: loadingDelete }] = useDeleteFactMutation();
 
+	// Function to handle fact deletion
 	const deleteHandler = async (id: string) => {
 		if (window.confirm("Are you sure you want to delete this fact?")) {
 			try {
 				await deleteFact(id);
-				refetch();
+				refetch(); // Refresh the data
 				toast.success("Fact successfully deleted");
 			} catch (err) {
-				toast.error(err?.data?.message || err.error);
+				toast.error((err as any)?.data?.message || (err as any)?.error);
 			}
 		}
 	};
 
 	return (
 		<>
+			{/* Render header and Create Fact button */}
 			<Row className="align-items-center">
 				<Col>
 					<h1>Facts</h1>
@@ -47,23 +52,35 @@ const FactListScreen = () => {
 				</Col>
 			</Row>
 
+			{/* Render loaders or messages based on state */}
 			{loadingDelete && <Loader />}
 			{isLoading ? (
 				<Loader />
 			) : error ? (
-				<Message variant="danger">{error}</Message>
+				<Message variant="danger">
+					{"message" in error ? error.message : "An error occurred"}
+				</Message>
 			) : (
 				<>
-					<FactTable
-						facts={data.facts}
-						deleteHandler={deleteHandler}
-					/>
-					<Paginate
-						pages={data.pages}
-						currentPage={data.page}
-						isAdmin={true}
-					/>
-					<p>{JSON.stringify(data)}</p>
+					{/* Conditionally Render the table of facts */}
+					{data && data.facts && (
+						<FactTable
+							facts={data.facts}
+							deleteHandler={deleteHandler}
+						/>
+					)}
+
+					{/* Conditionally Render pagination component */}
+					{data && data.pages && data.page && (
+						<Paginate
+							pages={data.pages}
+							currentPage={data.page}
+							isAdmin={true}
+						/>
+					)}
+
+					{/* Uncomment for debugging: print JSON data */}
+					{/* <p>{JSON.stringify(data)}</p> */}
 				</>
 			)}
 		</>

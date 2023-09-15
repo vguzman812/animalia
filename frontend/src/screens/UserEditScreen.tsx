@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { Form, Button, Row, Col } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Form, Button } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
 import Loader from "../components/Loader";
 import { toast } from "react-toastify";
@@ -10,30 +9,33 @@ import {
 	useUpdateUserMutation,
 } from "../slices/usersApiSlice";
 import Message from "../components/Message";
+import { SerializedError } from "@reduxjs/toolkit";
 
 const UserEditScreen = () => {
+	// State for form fields
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [isAdmin, setIsAdmin] = useState(false);
 
+	// Initialize navigation and location hooks
 	const navigate = useNavigate();
-	const location = useLocation();
-	const redirect = location.search ? location.search.split("=")[1] : "/";
 
+	// Get the userId from URL parameters
 	const { id: userId } = useParams<{ id: string }>();
 
+	// Fetching the user data for editing
 	const {
 		data: user,
 		isLoading,
 		refetch,
 		error,
 	} = useGetOneUserQuery(userId);
-	console.log(user);
 
+	// Mutation for updating a user
 	const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
 
+	// Effect to populate form fields when user data is available
 	useEffect(() => {
-		console.log("hello from use Effect edit fact screen");
 		if (user) {
 			setName(user.name);
 			setEmail(user.email);
@@ -41,31 +43,39 @@ const UserEditScreen = () => {
 		}
 	}, [user]);
 
-	const submitHandler = async (e) => {
+	// Function to handle form submission
+	const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-        try {
-            await updateUser({userId, name, email, isAdmin})
-            toast.success('User updated successfully')
-            refetch()
-            navigate("/admin/userlist")
-        } catch (err) {
-            toast.error(err?.data?.message || err.error)
-        }
-		console.log("Submit");
+		try {
+			await updateUser({ userId, name, email, isAdmin });
+			toast.success("User updated successfully");
+			refetch();
+			navigate("/admin/userlist");
+		} catch (err) {
+			toast.error((err as any)?.data?.message || (err as any)?.error);
+		}
 	};
 
+	// Component rendering logic
 	return (
 		<>
-        <Link to="/admin/userlist" className="btn btn-light my-3">Go Back</Link>
+			{/* Navigation back button */}
+			<Link
+				to="/admin/userlist"
+				className="btn btn-light my-3">
+				Go Back
+			</Link>
+
 			<FormContainer>
 				<h1>Edit User</h1>
 				{isUpdating && <Loader />}
 				{isLoading ? (
 					<Loader />
 				) : error ? (
-					<Message variant="danger">{error}</Message>
-				) : (
+					<Message variant="danger">{(error as SerializedError).message}</Message>
+					) : (
 					<Form onSubmit={submitHandler}>
+						{/* Name input field */}
 						<Form.Group
 							controlId="name"
 							className="my-3">
@@ -78,6 +88,8 @@ const UserEditScreen = () => {
 									setName(e.target.value)
 								}></Form.Control>
 						</Form.Group>
+
+						{/* Email input field */}
 						<Form.Group
 							controlId="email"
 							className="my-3">
@@ -90,17 +102,21 @@ const UserEditScreen = () => {
 									setEmail(e.target.value)
 								}></Form.Control>
 						</Form.Group>
+
+						{/* Is Admin checkbox */}
 						<Form.Group
 							controlId="text"
 							className="my-3">
 							<Form.Check
-                            type="checkbox"
-                            label="is Administrator"
-                            checked={isAdmin}
-                            onChange={(e) => setIsAdmin(e.target.checked)}>
-                            </Form.Check>
+								type="checkbox"
+								label="is Administrator"
+								checked={isAdmin}
+								onChange={(e) =>
+									setIsAdmin(e.target.checked)
+								}></Form.Check>
 						</Form.Group>
-						
+
+						{/* Submit Button */}
 						<Button
 							type="submit"
 							variant="primary"
@@ -111,15 +127,6 @@ const UserEditScreen = () => {
 						{isLoading && <Loader />}
 					</Form>
 				)}
-
-				<Row className="py-3">
-					<Col>
-						<Link
-							to={redirect ? `/login?redirect=${redirect}` : "/"}>
-							Go Back
-						</Link>
-					</Col>
-				</Row>
 			</FormContainer>
 		</>
 	);

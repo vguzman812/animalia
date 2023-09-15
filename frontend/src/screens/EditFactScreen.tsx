@@ -12,46 +12,60 @@ import {
 import Message from "../components/Message";
 
 const EditFactScreen = () => {
+	// Initialize state variables for form fields
 	const [animal, setAnimal] = useState("");
 	const [source, setSource] = useState("");
 	const [text, setText] = useState("");
 	const [media, setMedia] = useState("");
 	const [wiki, setWiki] = useState("");
 
+	// Initialize React Router hooks
 	const navigate = useNavigate();
 	const location = useLocation();
 	const redirect = location.search ? location.search.split("=")[1] : "/";
-
 	const { id: factId } = useParams<{ id: string }>();
 
+	// Fetch the fact to be edited
 	const {
 		data: fact,
 		isLoading,
 		refetch,
 		error,
-	} = useGetOneFactQuery(factId);
-	console.log(fact);
+	} = factId
+		? useGetOneFactQuery(factId)
+		: { data: null, isLoading: false, refetch: () => {}, error: null };
 
-	const { userInfo } = useSelector((state) => state.auth);
+	interface RootState {
+		auth: {
+			userInfo: any; // Replace 'any' with the actual type of userInfo. I am too lazy for this rn.
+		};
+	}
+	// Getting the logged-in user's info from Redux store
+	const { userInfo } = useSelector((state: RootState) => state.auth);
 
+	// Hook to handle the update mutation
 	const [updateFact, { isLoading: isUpdating }] = useUpdateFactMutation();
 
+	// Update form fields with fact data when component mounts
 	useEffect(() => {
-		console.log("hello from use Effect edit fact screen");
 		if (fact) {
+			// Redirect non-owners and non-admins
 			if (userInfo._id !== fact.user && !userInfo.isAdmin) {
 				navigate(`/fact/${factId}`);
 			}
-			setAnimal(fact.animal);
-			setSource(fact.source);
-			setText(fact.text);
-			setMedia(fact.media);
-			setWiki(fact.wiki);
+			setAnimal(fact.animal || "");
+			setSource(fact.source || "");
+			setText(fact.text || "");
+			setMedia(fact.media || "");
+			setWiki(fact.wiki || "");
 		}
 	}, [fact]);
 
-	const submitHandler = async (e) => {
+	// Handle form submission
+	const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+
+		// Validation checks
 		if (!animal || !source || !text || !media || !wiki) {
 			toast.error("Please fill in all fields.");
 			return;
@@ -59,30 +73,36 @@ const EditFactScreen = () => {
 			toast.error("Fact must be at least 30 characters long");
 		} else {
 			try {
-				const updatedFact = {
-					_id: factId,
-					user: fact.user,
-					animal,
-					source,
-					text,
-					media,
-					wiki,
-				}
-				const result = await updateFact(updatedFact).unwrap();
-				if (result.error){
-					toast.error(result.error)
-				} else {
-					toast.success('Product updated')
-					refetch()
-					navigate(`/fact/${factId}`);
+				if (fact) {
+					// Prepare data and attempt to update
+					const updatedFact = {
+						_id: factId,
+						user: fact?.user,
+						animal,
+						source,
+						text,
+						media,
+						wiki,
+					};
+					const result = (await updateFact(
+						updatedFact
+					).unwrap()) as any;
+					if (result.error) {
+						toast.error(result.error);
+					} else {
+						toast.success("Product updated");
+						refetch();
+						navigate(`/fact/${factId}`);
+					}
 				}
 			} catch (err) {
 				console.log(err);
-				toast.error(err?.data?.message || err.message);
+				toast.error((err as any)?.data?.message || (err as any)?.error);
 			}
 		}
 	};
 
+	// Render the form and various states (loading, error, etc.)
 	return (
 		<>
 			<FormContainer>
@@ -91,7 +111,11 @@ const EditFactScreen = () => {
 				{isLoading ? (
 					<Loader />
 				) : error ? (
-					<Message variant="danger">{error}</Message>
+					<Message variant="danger">
+						{"message" in error
+							? error.message
+							: "An error occurred"}
+					</Message>
 				) : (
 					<Form onSubmit={submitHandler}>
 						<Form.Group

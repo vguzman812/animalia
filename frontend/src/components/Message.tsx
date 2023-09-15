@@ -1,6 +1,7 @@
 import { Alert } from "react-bootstrap";
+import MessageType from "../types/messageType";
 
-const Message = ({ variant, children }) => {
+const Message = ({ variant, children }: MessageType) => {
 	return <Alert variant={variant}>{children}</Alert>;
 };
 

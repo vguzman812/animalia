@@ -12,9 +12,17 @@ import { toast } from "react-toastify";
 import Meta from "../components/Meta";
 
 const FactScreen = () => {
+	// Extracting fact ID from the URL
 	const { id } = useParams<{ id: string }>();
-	const { userInfo } = useSelector((state) => state.auth);
+	interface RootState {
+		auth: {
+			userInfo: any; // Replace 'any' with the actual type of userInfo. I am too lazy for this rn.
+		};
+	}
+	// Getting user information from the Redux store
+	const { userInfo } = useSelector((state: RootState) => state.auth);
 
+	// Fetching a single fact based on the ID
 	const {
 		data: singleFact,
 		isLoading,
@@ -23,33 +31,36 @@ const FactScreen = () => {
 	} = useGetOneFactQuery(id!) as {
 		data: FactType;
 		isLoading: boolean;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		error: any;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		refetch: any;
 	};
 
+	// Check if the fact is liked by the logged-in user
 	const isLikedByUser = singleFact?.likes?.some(
 		(likeId) => likeId.toString() === userInfo._id.toString()
 	);
 
+	// Like fact mutation hook
 	const [likeFact, { isLoading: likesLoading }] = useLikeFactMutation();
 
-	const handleLike = async (e) => {
+	// Handler for liking/unliking the fact
+	const handleLike = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		try {
-			await likeFact(id);
+			await likeFact(id!);
 			toast.success("Fact Liked.");
 			refetch();
 		} catch (err) {
-			toast.error(err?.data?.message || err.error);
+			toast.error((err as any)?.data?.message || (err as any)?.error);
 		}
 	};
 
+	// Loader display while fetching data
 	if (isLoading) {
 		return <Loader />;
 	}
 
+	// Error display if fetching fails
 	if (error) {
 		return (
 			<Message variant="danger">
@@ -60,7 +71,7 @@ const FactScreen = () => {
 
 	return (
 		<>
-		<Meta title={singleFact.animal} description={singleFact.text}/>
+			<Meta title={singleFact.animal} description={singleFact.text} />
 			<Link
 				className="btn btn-light my-3"
 				to="/">

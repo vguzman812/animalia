@@ -1,18 +1,14 @@
 import { Table, Button } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
-import { FaTimes, FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import Loader from "../components/Loader";
 import FactType from "../types/factType";
-import AllFactsType from "../types/allFactsType";
-
-
 
 type FactTableProps = {
-    facts: FactType[];
-    deleteHandler: (id: string) => void;  // Function prop for handling deletes
-  };
-const FactTable = ({facts, deleteHandler}: FactTableProps) => {
+	facts: FactType[];
+	deleteHandler: (id: string) => void; // Function prop for handling deletes
+};
+const FactTable = ({ facts, deleteHandler }: FactTableProps) => {
 	return (
 		<Table
 			striped
@@ -61,7 +57,11 @@ const FactTable = ({facts, deleteHandler}: FactTableProps) => {
 								<Button
 									variant="danger"
 									className="btn-sm mx-2 my-2"
-									onClick={() => deleteHandler(fact._id)}>
+									onClick={() => {
+										if (fact._id) {
+											deleteHandler(fact._id);
+										}
+									}}>
 									<FaTrash style={{ color: "white" }} />
 								</Button>
 							</td>

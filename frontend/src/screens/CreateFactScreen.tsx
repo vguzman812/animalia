@@ -1,29 +1,33 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
 import FormContainer from "../components/FormContainer";
 import Loader from "../components/Loader";
 import { toast } from "react-toastify";
 import { useCreateFactMutation } from "../slices/factsApiSlice";
 
+// Define the CreateFactScreen component
 const CreateFactScreen = () => {
+	// Initialize local state variables using React hooks
 	const [animal, setAnimal] = useState("");
 	const [source, setSource] = useState("");
 	const [text, setText] = useState("");
 	const [media, setMedia] = useState("");
 	const [wiki, setWiki] = useState("");
 
+	// Hooks for navigation and route location
 	const navigate = useNavigate();
-    const location = useLocation();
-	const redirect = location.search ? location.search.split('=')[1] : '/';
+	const location = useLocation();
+	const redirect = location.search ? location.search.split("=")[1] : "/";
 
+	// Custom hook for creating a new fact, with its loading and error states
+	const [createFact, { isLoading }] = useCreateFactMutation();
 
-	const [createFact, { isLoading, error }] = useCreateFactMutation();
-
-	const submitHandler = async (e) => {
+	// Function to handle form submission
+	const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		try {
+			// Call the createFact API with form values and unwrap the Promise
 			await createFact({
 				animal,
 				source,
@@ -31,12 +35,15 @@ const CreateFactScreen = () => {
 				media,
 				wiki,
 			}).unwrap();
+			// Navigate to the home page after successful creation
 			navigate("/");
 		} catch (err) {
-			toast.error(err?.data?.message || err.error);
+			// Show error toast if creation fails
+			toast.error((err as any)?.data?.message || (err as any)?.error);
 		}
 	};
 
+	// Render the component
 	return (
 		<FormContainer>
 			<h1>Create a fact</h1>

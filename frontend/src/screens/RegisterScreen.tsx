@@ -9,30 +9,42 @@ import { setCredentials } from "../slices/authSlice";
 import { toast } from "react-toastify";
 
 const RegisterScreen = () => {
+	// State variables for form fields
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 
+	// Initialize Redux dispatch and navigation hooks
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
+	// Fetching registration state
 	const [register, { isLoading }] = useRegisterMutation();
-	const { userInfo } = useSelector((state) => state.auth);
 
+	interface RootState {
+		auth: {
+			userInfo: any; // Replace 'any' with the actual type of userInfo. I am too lazy for this rn.
+		};
+	}
+	const { userInfo } = useSelector((state: RootState) => state.auth);
+
+	// Get the redirect parameter from URL
 	const { search } = useLocation();
 	const sp = new URLSearchParams(search);
 	const redirect = sp.get("redirect") || "/";
 
+	// Effect to navigate user if already logged in
 	useEffect(() => {
-		console.log("hello from use Effect register screen");
 		if (userInfo) {
 			navigate(redirect);
 		}
 	}, [userInfo, redirect, navigate]);
 
-	const submitHandler = async (e) => {
+	// Function to handle form submission
+	const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		// Check for password match
 		if (password !== confirmPassword) {
 			toast.error("Passwords do not match.");
 			return;
@@ -42,15 +54,17 @@ const RegisterScreen = () => {
 				dispatch(setCredentials({ ...res }));
 				navigate(redirect);
 			} catch (err) {
-				toast.error(err?.data?.message || err.error);
+				toast.error((err as any)?.data?.message || (err as any)?.error);
 			}
- 		}
+		}
 	};
 
+	// Component rendering logic
 	return (
 		<FormContainer>
 			<h1>Register</h1>
 			<Form onSubmit={submitHandler}>
+				{/* Name input field */}
 				<Form.Group
 					controlId="name"
 					className="my-3">
@@ -63,6 +77,8 @@ const RegisterScreen = () => {
 							setName(e.target.value)
 						}></Form.Control>
 				</Form.Group>
+
+				{/* Email input field */}
 				<Form.Group
 					controlId="email"
 					className="my-3">
@@ -75,6 +91,8 @@ const RegisterScreen = () => {
 							setEmail(e.target.value)
 						}></Form.Control>
 				</Form.Group>
+
+				{/* Password input field */}
 				<Form.Group
 					controlId="password"
 					className="my-3">
@@ -87,6 +105,8 @@ const RegisterScreen = () => {
 							setPassword(e.target.value)
 						}></Form.Control>
 				</Form.Group>
+
+				{/* Confirm Password input field */}
 				<Form.Group
 					controlId="confirmPassword"
 					className="my-3">
@@ -99,6 +119,8 @@ const RegisterScreen = () => {
 							setConfirmPassword(e.target.value)
 						}></Form.Control>
 				</Form.Group>
+
+				{/* Register Button */}
 				<Button
 					type="submit"
 					variant="primary"
@@ -108,6 +130,8 @@ const RegisterScreen = () => {
 				</Button>
 				{isLoading && <Loader />}
 			</Form>
+
+			{/* Link to login screen */}
 			<Row className="py-3">
 				<Col>
 					Already Have an Account?{" "}

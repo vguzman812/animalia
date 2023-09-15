@@ -1,5 +1,7 @@
 import { Pagination } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
+import PaginateType from "../types/paginationType";
+
 
 const Paginate = ({
 	pages,
@@ -7,7 +9,7 @@ const Paginate = ({
 	isAdmin = false,
 	facts = true,
 	keyword = "",
-}) => {
+}: PaginateType) => {
 	return (
 		<>
 			{pages > 1 && (

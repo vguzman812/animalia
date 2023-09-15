@@ -10,12 +10,14 @@ const FactsCarousel = () => {
 	return isLoading ? (
 		<Loader />
 	) : error ? (
-		<Message variant="danger">{error}</Message>
+		<Message variant="danger">
+			{"message" in error ? error.message : "An error occurred"}
+		</Message>
 	) : (
 		<Carousel
 			pause="hover"
 			className="bg-dark mb-4">
-			{facts.map((fact) => (
+			{Array.isArray(facts) && facts.map((fact) => (
 				<Carousel.Item key={fact._id}>
 					<Link to={`/fact/${fact._id}`}>
 						<Image
