@@ -21,7 +21,6 @@ const FactScreen = () => {
 	}
 	// Getting user information from the Redux store
 	const { userInfo } = useSelector((state: RootState) => state.auth);
-
 	// Fetching a single fact based on the ID
 	const {
 		data: singleFact,
@@ -46,12 +45,16 @@ const FactScreen = () => {
 	// Handler for liking/unliking the fact
 	const handleLike = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
-		try {
-			await likeFact(id!);
-			toast.success("Fact Liked.");
-			refetch();
-		} catch (err) {
-			toast.error((err as any)?.data?.message || (err as any)?.error);
+		if (!userInfo){
+			toast.error("You need to be logged in to like a fact.")
+		} else {	
+			try {
+				await likeFact(id!);
+				toast.success("Fact Liked.");
+				refetch();
+			} catch (err) {
+				toast.error((err as any)?.data?.message || (err as any)?.error);
+			}
 		}
 	};
 
