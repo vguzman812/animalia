@@ -8,7 +8,7 @@ import { notFound, errorHandler } from "./middleware/errorHandler.js";
 import path from "path";
 
 // Initialize port from environment variables or use 8888 as default
-const port = process.env.PORT || 8888;
+const port = process.env.PORT || import.meta.env.PORT || 8888;
 
 // Connect to database
 connectDb();
@@ -23,12 +23,6 @@ app.use(Express.urlencoded({ extended: true }));
 // Middleware for parsing cookies
 app.use(cookieParser());
 
-// Basic route for the root URL
-app.get("/", (req, res) => {
-	console.log("Hello from /");
-	res.send("API running");
-});
-
 // Define API routes for facts and users
 app.use("/api/facts", factRoutes);
 app.use("/api/users", userRoutes);
@@ -37,7 +31,10 @@ app.use("/api/users", userRoutes);
 const __dirname = path.resolve();
 
 // Check if app is running in production environment
-if (process.env.NODE_ENV === "production") {
+if (
+	process.env.NODE_ENV === "production" ||
+	import.meta.env.MODE === "production"
+) {
 	// Set the static folder for serving frontend files
 	app.use(Express.static(path.join(__dirname, "/frontend/dist")));
 
@@ -45,6 +42,12 @@ if (process.env.NODE_ENV === "production") {
 	app.get("*", (req, res) =>
 		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
 	);
+} else {
+	// Basic route for the root URL
+	app.get("/", (req, res) => {
+		console.log("Hello from /");
+		res.send("API running");
+	});
 }
 
 // Middleware for handling 404 not found errors
@@ -54,4 +57,4 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Start the Express server
-app.listen(port, () => console.log(`Server running on  localhost:${port}`));
+app.listen(port, () => console.log(`Server running on ${port}`));

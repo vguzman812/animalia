@@ -7,7 +7,7 @@ import Fact from "../models/factModel.js";
  * @access      Public
  */
 const getFacts = asyncHandler(async (req, res) => {
-	const pageSize = 12;
+	const pageSize = process.env.PAGINATION_LIMIT;
 	const page = Number(req.query.pageNumber) || 1;
 	const keyword = req.query.keyword
 		? {
