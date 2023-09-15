@@ -18,12 +18,13 @@ const FactsCarousel = () => {
 			pause="hover"
 			className="bg-dark mb-4">
 			{Array.isArray(facts) && facts.map((fact) => (
-				<Carousel.Item key={fact._id}>
+				<Carousel.Item key={fact._id} className="carousel-container">
 					<Link to={`/fact/${fact._id}`}>
 						<Image
 							src={fact.media}
 							alt={fact.animal}
 							fluid
+							className="carousel-image"
 						/>
 						<Carousel.Caption>
 							<h2>{fact.animal}</h2>
