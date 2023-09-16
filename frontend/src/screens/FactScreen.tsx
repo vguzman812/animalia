@@ -35,9 +35,9 @@ const FactScreen = () => {
 	};
 
 	// Check if the fact is liked by the logged-in user
-	const isLikedByUser = singleFact?.likes?.some(
+	const isLikedByUser = userInfo ? singleFact?.likes?.some(
 		(likeId) => likeId.toString() === userInfo._id.toString()
-	);
+	) : false;
 
 	// Like fact mutation hook
 	const [likeFact, { isLoading: likesLoading }] = useLikeFactMutation();
