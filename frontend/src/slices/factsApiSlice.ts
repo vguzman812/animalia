@@ -26,6 +26,14 @@ export const factsApiSlice = apiSlice.injectEndpoints({
 			query: () => ({ url: `${FACTS_URL}/top` }),
 			keepUnusedDataFor: 5,
 		}),
+		// Query to get all facts made by one user based on user id
+		getAllFactsByUserId: builder.query<AllFactsType, any>({
+			query: ({ id, pageNumber }) => ({
+				url: `${FACTS_URL}/user/${id}`,	
+				params: { id, pageNumber },
+			}),
+			keepUnusedDataFor: 5,
+		}),
 		// Mutation to create a new fact
 		createFact: builder.mutation<FactType, CreateFactType>({
 			query: (data) => ({
@@ -70,4 +78,5 @@ export const {
 	useDeleteFactMutation,
 	useLikeFactMutation,
 	useGetTopFactsQuery,
+	useGetAllFactsByUserIdQuery
 } = factsApiSlice;

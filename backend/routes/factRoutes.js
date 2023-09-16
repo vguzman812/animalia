@@ -39,6 +39,6 @@ router.route("/:id/like").post(protect, likeFact);
 
 // Route to get facts by a user's ID
 // Access: Public
-router.route("/user/:id").get(getFactsByUser);
+router.route("/user/:userId").get(getFactsByUser);
 
 export default router;

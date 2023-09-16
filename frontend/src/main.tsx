@@ -73,7 +73,7 @@ const router = createBrowserRouter(
 				path=""
 				element={<PrivateRoute />}>
 				<Route
-					path="/profile"
+					path="/fact/user/:id"
 					element={<ProfileScreen />}
 				/>
 				<Route
