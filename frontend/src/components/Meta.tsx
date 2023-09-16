@@ -11,8 +11,8 @@ const Meta = ({title, description, keywords}: MetaType) => {
   )
 }
 Meta.defaultProps = {
-    title: "Welcome to animal facts",
+    title: "Animalia - One Stop Shop for user-created and upvoted animal facts.",
     description: "A place for all your fun animal fact needs",
-    keywords: "animal, animal facts, fun facts, facts"
+    keywords: "animal, animal facts, fun facts, facts, animalia"
 }
 export default Meta
