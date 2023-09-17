@@ -21,7 +21,8 @@ const getFacts = asyncHandler(async (req, res) => {
 	const count = await Fact.countDocuments({ ...keyword });
 	const facts = await Fact.find({ ...keyword })
 		.limit(pageSize)
-		.skip(pageSize * (page - 1));
+		.skip(pageSize * (page - 1))
+		.sort({ createdAt: -1 });
 	res.status(200).json({ facts, page, pages: Math.ceil(count / pageSize) });
 });
 
@@ -90,8 +91,10 @@ const getFactsByUser = asyncHandler(async (req, res) => {
 	const page = Number(req.query.pageNumber) || 1;
 
 	// Find facts by user ID
-	const count = await Fact.countDocuments({user: userId});
+	const count = await Fact.countDocuments({ user: userId });
 	const facts = await Fact.find({ user: userId })
+		.sort({ createdAt: -1 })
+
 		.limit(pageSize)
 		.skip(pageSize * (page - 1));
 

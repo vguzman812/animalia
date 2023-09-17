@@ -12,6 +12,12 @@ connectDb();
 
 // Function to populate the database with sample data
 const importData = async () => {
+
+	// function to allow for different creation times in the db of seeded data
+	const sleep = (milliseconds) => {
+		return new Promise((resolve) => setTimeout(resolve, milliseconds));
+	};
+
 	try {
 		// Delete all existing users and facts
 		await User.deleteMany();
@@ -29,8 +35,10 @@ const importData = async () => {
 		});
 
 		// Insert the mapped facts into the Fact collection
-		await Fact.insertMany(createdFacts);
-
+		for (let i = 0; i < createdFacts.length; i++) {
+			await Fact.create(createdFacts[i]);
+			await sleep(500); // wait for 1 second
+		}
 		// Log a success message
 		console.log("Data Imported!".green.inverse);
 		process.exit();
