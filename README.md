@@ -20,7 +20,6 @@
   <a href="#license">License</a>
 </p>
 
-![A gif of the app in use](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnptZGhuemtsbmhoMGt1M3YzdnpkMmNvdWRuOWQ5Zmd2aDd0bWtnaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Zm8QMnNhwLuJ6QKmGy/giphy.gif)
 
 ## Key Features
 
@@ -31,6 +30,8 @@
 * Tech Stack: This robust platform is engineered using the MERN stack (MongoDB, Express.js, React, Node.js), ensuring high performance and a responsive user experience.
 
 ## How To Use
+
+![A gif of the app in use](https://media.giphy.com/media/Zm8QMnNhwLuJ6QKmGy/giphy.gif)
 
 * Some images may be blank because media type for that fact may not be a picture. 
 * Facts are sorted most recent first.
