@@ -20,7 +20,7 @@
   <a href="#license">License</a>
 </p>
 
-![screenshot](https://raw.githubusercontent.com/amitmerchant1990/electron-markdownify/master/app/img/markdownify.gif)
+![screenshot](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnptZGhuemtsbmhoMGt1M3YzdnpkMmNvdWRuOWQ5Zmd2aDd0bWtnaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Zm8QMnNhwLuJ6QKmGy/giphy.gif)
 
 ## Key Features
 
