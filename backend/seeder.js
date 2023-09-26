@@ -35,9 +35,13 @@ const importData = async () => {
 		});
 
 		// Insert the mapped facts into the Fact collection
+		console.log("Seeding db. Please be patient...")
+		let count = 1;
 		for (let i = 0; i < createdFacts.length; i++) {
+			console.log(`Adding fact ${count} of ${createdFacts.length}`)
 			await Fact.create(createdFacts[i]);
-			await sleep(500); // wait for 1 second
+			await sleep(500); // wait for .5 second in between facts population
+			count++
 		}
 		// Log a success message
 		console.log("Data Imported!".green.inverse);
