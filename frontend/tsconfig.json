@@ -20,6 +20,6 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "src/store.ts"],
+  "include": ["src", "src/store.ts", "scratch.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

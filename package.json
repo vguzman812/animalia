@@ -1,34 +1,62 @@
 {
-	"name": "animalapi",
-	"version": "1.0.0",
-	"description": "A CRUD app for animal facts scraped from the web.",
-	"type": "module",
-	"main": "server.js",
-	"scripts": {
-		"dev": "concurrently \"npm run server\" \"npm run client\"",
-		"server": "nodemon backend/server.js",
-		"client": "npm run dev --prefix frontend",
-		"data:import": "node backend/seeder.js",
-		"data:destroy": "node backend/seeder.js -D",
-		"build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
-		"start": "node backend/server.js"
-	},
-	"author": "Vincent Guzman",
-	"license": "MIT",
-	"dependencies": {
-		"bcryptjs": "^2.4.3",
-		"colors": "^1.4.0",
-		"cookie-parser": "^1.4.6",
-		"cors": "^2.8.5",
-		"dotenv": "^16.3.1",
-		"express": "^4.18.2",
-		"helmet": "^7.0.0",
-		"jsonwebtoken": "^9.0.2",
-		"mongodb": "^6.0.0",
-		"mongoose": "^7.5.1"
-	},
-	"devDependencies": {
-		"concurrently": "^8.2.1",
-		"nodemon": "^3.0.1"
-	}
+  "name": "animalapi",
+  "version": "1.0.0",
+  "description": "A CRUD app for animal facts scraped from the web.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon backend/server.js",
+    "client": "npm run dev --prefix frontend",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\"",
+    "data:import": "node backend/seeder.js",
+    "data:destroy": "node backend/seeder.js -D",
+    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "node backend/server.js"
+  },
+  "author": "Vincent Guzman",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "colors": "^1.4.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.0.0",
+    "mongoose": "^7.5.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "concurrently": "^8.2.1",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-standard-with-typescript": "^43.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.5.0",
+    "eslint-plugin-prettier": "^5.1.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.33.2",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true,
+    "jsxSingleQuote": true,
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "jsxBracketSameLine": false,
+    "arrowParens": "always",
+    "endOfLine": "lf"
+  }
 }
