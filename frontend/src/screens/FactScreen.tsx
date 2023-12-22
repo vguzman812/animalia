@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Row, Col, Image, ListGroup, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import FactType from '../types/factType';
@@ -7,6 +8,7 @@ import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { toast } from 'react-toastify';
 import Meta from '../components/Meta';
+import fallbackImageUrl from '../assets/images/generic-animal-placeholder.webp';
 
 const FactScreen = () => {
   // Extracting fact ID from the URL
@@ -55,6 +57,25 @@ const FactScreen = () => {
     }
   };
 
+  // logic for generating placeholder image if fact.media does not lead to an image
+  const fallbackImage = fallbackImageUrl;
+  const [imgSrc, setImgSrc] = useState<string>(fallbackImage);
+
+  useEffect(() => {
+    if (singleFact?.media) {
+      const loadImage = new window.Image();
+      loadImage.src = singleFact.media;
+      loadImage.onerror = () => {
+        setImgSrc(fallbackImage);
+      };
+      loadImage.onload = () => {
+        setImgSrc(singleFact.media!);
+      };
+    } else {
+      setImgSrc(fallbackImage);
+    }
+  }, [singleFact]);
+
   // Loader display while fetching data
   if (isLoading) {
     return <Loader />;
@@ -73,7 +94,7 @@ const FactScreen = () => {
       </Link>
       <Row>
         <Col md={5}>
-          <Image src={singleFact.media} alt={singleFact.animal} fluid />
+          <Image src={imgSrc} alt={singleFact.animal} fluid />
         </Col>
         <Col md={4}>
           <p>{singleFact.text}</p>

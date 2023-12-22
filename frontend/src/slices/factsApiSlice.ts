@@ -13,13 +13,11 @@ export const factsApiSlice = apiSlice.injectEndpoints({
         url: FACTS_URL,
         params: { keyword, pageNumber },
       }),
-      providesTags: (result = [], error, tag) => [
+      providesTags: (result?: AllFactsType) => [
         'Fact',
-        ...result.map((fact) => {
-          const id = fact.id;
-          return { type: 'Fact', id };
-        }),
+        ...(result?.facts?.map((fact) => ({ type: 'Fact' as const })) ?? []),
       ],
+
       keepUnusedDataFor: 5,
     }),
     // Query to get a single fact by its ID
