@@ -17,6 +17,7 @@ const FactCard = ({ fact }: { fact: FactType }) => {
     } else {
       setImgSrc(fallbackImage);
     }
+  /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [fact.media]);
 
   return (

@@ -13,7 +13,7 @@ const FactsCarousel = () => {
   // State for storing image URLs
   const [imageUrls, setImageUrls] = useState({});
 
-  const loadImage = (fact) => {
+  const loadImage = (fact: { media: string; _id: any; }) => {
     const image = new window.Image();
     image.src = fact.media;
 
@@ -36,6 +36,7 @@ const FactsCarousel = () => {
         }
       });
     }
+  /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [facts]);
 
   return isLoading ? (
