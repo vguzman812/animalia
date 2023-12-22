@@ -74,7 +74,7 @@ const FactScreen = () => {
     } else {
       setImgSrc(fallbackImage);
     }
-  /* eslint-disable-next-line react-hooks/exhaustive-deps */
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [singleFact]);
 
   // Loader display while fetching data

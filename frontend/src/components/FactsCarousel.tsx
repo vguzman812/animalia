@@ -11,9 +11,9 @@ const FactsCarousel = () => {
   const { data: facts, isLoading, error } = useGetTopFactsQuery();
 
   // State for storing image URLs
-  const [imageUrls, setImageUrls] = useState({});
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
 
-  const loadImage = (fact: { media: string; _id: any; }) => {
+  const loadImage = (fact: { media: string; _id: any }) => {
     const image = new window.Image();
     image.src = fact.media;
 
@@ -36,7 +36,7 @@ const FactsCarousel = () => {
         }
       });
     }
-  /* eslint-disable-next-line react-hooks/exhaustive-deps */
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [facts]);
 
   return isLoading ? (
@@ -59,7 +59,6 @@ const FactsCarousel = () => {
                 <p className='carousel-text p-3'>{fact.text}</p>
               </div>
               <Carousel.Caption className=' d-flex justify-content-center align-items-center'>
-                {/* <div className="bg-dark opacity-50"> */}
                 <h2
                   className=''
                   style={{
@@ -68,7 +67,6 @@ const FactsCarousel = () => {
                 >
                   {fact.animal}
                 </h2>
-                {/* </div> */}
               </Carousel.Caption>
             </Link>
           </Carousel.Item>
