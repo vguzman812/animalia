@@ -8,7 +8,7 @@ import { notFound, errorHandler } from './middleware/errorHandler.js';
 import path from 'path';
 
 // Initialize port from environment variables or use 8888 as default
-const port = process.env.PORT || import.meta.env.PORT || 8888;
+const port = process.env.PORT || 8888;
 
 // Connect to database
 connectDb();
@@ -31,7 +31,7 @@ app.use('/api/users', userRoutes);
 const __dirname = path.resolve();
 
 // Check if app is running in production environment
-if (process.env.NODE_ENV === 'production' || import.meta.env.MODE === 'production') {
+if (process.env.NODE_ENV === 'production') {
   // Set the static folder for serving frontend files
   app.use(Express.static(path.join(__dirname, '/frontend/dist')));
 
