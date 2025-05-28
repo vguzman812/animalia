@@ -14,7 +14,8 @@
     "data:import": "node backend/seeder.js",
     "data:destroy": "node backend/seeder.js -D",
     "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
-    "start": "node backend/server.js"
+    "start": "node backend/server.js",
+    "test:server": "NODE_ENV=test node --test"
   },
   "license": "MIT",
   "dependencies": {
@@ -43,6 +44,7 @@
     "eslint-plugin-react": "^7.33.2",
     "nodemon": "^3.0.1",
     "prettier": "^3.1.1",
+    "supertest": "^7.1.1",
     "typescript": "^5.3.3"
   },
   "prettier": {

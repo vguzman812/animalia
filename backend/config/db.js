@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+const MONGO_URI = process.NODE_ENV === 'test' ? process.env.MONGO_URI_TEST : process.env.MONGO_URI;
 // Define an asynchronous function to connect to MongoDB
 async function connectDb() {
   try {
