@@ -16,7 +16,6 @@
     "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
     "start": "node backend/server.js"
   },
-  "author": "Vincent Guzman",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",

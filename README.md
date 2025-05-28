@@ -1,13 +1,5 @@
 
-<h1 align="center">
-  <br>
-  <a href="https://animal-facts.onrender.com"><img src="https://images.unsplash.com/photo-1692988801986-61ec2e011257?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2670&q=80" alt="Animalia" width="200"></a>
-  <br>
-  Animalia
-  <br>
-</h1>
 
-<h4 align="center"><a href="https://animal-facts.onrender.com">Animalia</a> : The Community-Powered Encyclopedia of Animal Facts 🦁🦋🦎</h4>
 
 <br/>
 
@@ -31,7 +23,6 @@
 
 ## How To Use
 
-![A gif of the app in use](https://media.giphy.com/media/Zm8QMnNhwLuJ6QKmGy/giphy.gif)
 
 * Some images may be blank because media type for that fact may not be a picture. 
 * Facts are sorted most recent first.
@@ -53,7 +44,7 @@ To clone and run this application, you'll need [Git](https://git-scm.com) and [N
 
 ```bash
 # Clone this repository
-$ git clone https://github.com/vguzman812/animalApi.git
+$ git clone https://github.com/whatever/animalApi.git
 
 # Go into the repository
 $ cd animalApi
@@ -68,32 +59,3 @@ $ npm run dev
 <p>Client side should now be running on localhost:5173</p>
 <p>API should be running on localhost:8888</p>
 <p>Have fun with the local development</p>
-
-
-## Credits
-
-I initially stumbled upon this data set from [this](https://github.com/ekohrt/animal-fun-facts-dataset) repo.  I am working on completing the scraper and gathering much more, and higher quality facts.
-- Credit to [ekohrt](https://github.com/ekohrt) for the data.
-- Current facts scraper: [Here](https://github.com/vguzman812/animalScraping)
-
-
-## Support
-
-<a href="https://www.buymeacoffee.com/vincentg" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/purple_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-
-
-## You may also like...
-
-- [Animal Facts Text Service](https://github.com/vguzman812/AnimalFactsTexter) - A text messaging service using these facts and twilio's messaging APIs.
-
-- [Tranquil Tomato](https://github.com/vguzman812/tranquilTomato) - A pomodoro app featuring nature music, zen quotes, and peaceful background images.
-
-- [IdeaGenie](https://github.com/amitmerchant1990/blog_repo) - Another full stack social app with a blog-like feeling.
-
-## License
-
-MIT
-
----
-
-> [LinkedIn](https://www.linkedin.com/in/vincent-guzman/)
