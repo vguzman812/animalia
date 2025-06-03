@@ -8,7 +8,7 @@ import { notFound, errorHandler } from './middleware/errorHandler.js';
 import path from 'path';
 
 // Initialize port from environment variables or use 8888 as default
-const port = process.env.PORT || import.meta.env.PORT || 8888;
+const port = process.env.PORT || 8888;
 
 // Connect to database
 connectDb();
