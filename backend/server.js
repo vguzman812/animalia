@@ -31,7 +31,7 @@ app.use('/api/users', userRoutes);
 const __dirname = path.resolve();
 
 // Check if app is running in production environment
-if (process.env.NODE_ENV === 'production' || import.meta.env.MODE === 'production') {
+if (process.env.NODE_ENV === 'production') {
   // Set the static folder for serving frontend files
   app.use(Express.static(path.join(__dirname, '/frontend/dist')));
 
