@@ -1,4 +1,3 @@
-import asyncHandler from '../middleware/asyncHandler.js';
 import User from '../models/userModel.js';
 import generateToken from '../utils/generateToken.js';
 
@@ -7,7 +6,7 @@ import generateToken from '../utils/generateToken.js';
  * @route       POST /api/users/login
  * @access      Public
  */
-const authUser = asyncHandler(async (req, res) => {
+const authUser = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (user && (await user.matchPassword(password))) {
@@ -22,14 +21,14 @@ const authUser = asyncHandler(async (req, res) => {
     res.status(401);
     throw new Error('Invalid email or password');
   }
-});
+}
 
 /**
  * @description Register user
  * @route       POST /api/users
  * @access      Public
  */
-const registerUser = asyncHandler(async (req, res) => {
+const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
   // Check for user existence via email
   const userExists = await User.findOne({ email });
@@ -57,28 +56,28 @@ const registerUser = asyncHandler(async (req, res) => {
       throw new Error('Invalid user data.');
     }
   }
-});
+}
 
 /**
  * @description Log out user & clear cookie
  * @route       POST /api/users/logout
  * @access      Private
  */
-const logoutUser = asyncHandler(async (req, res) => {
+const logoutUser = async (req, res) => {
   // Clear the JWT cookie
   res.cookie('jwt', '', {
     httpOnly: true,
     expires: new Date(0),
   });
   res.status(200).json({ message: 'logged out successfully' });
-});
+}
 
 /**
  * @description Get user profile
  * @route       GET /api/users/profile
  * @access      Private
  */
-const getUserProfile = asyncHandler(async (req, res) => {
+const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
@@ -93,14 +92,14 @@ const getUserProfile = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('User not found');
   }
-});
+}
 
 /**
  * @description Update user profile
  * @route       PUT /api/users/profile
  * @access      Private
  */
-const updateUserProfile = asyncHandler(async (req, res) => {
+const updateUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
@@ -119,14 +118,14 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       isAdmin: updatedUser.isAdmin,
     });
   }
-});
+}
 
 /**
  * @description Get all users
  * @route       GET /api/users
  * @access      Private/Admin
  */
-const getAllUsers = asyncHandler(async (req, res) => {
+const getAllUsers = async (req, res) => {
   const pageSize = process.env.PAGINATION_LIMIT;
   const page = Number(req.query.pageNumber) || 1;
   const count = await User.countDocuments();
@@ -135,14 +134,14 @@ const getAllUsers = asyncHandler(async (req, res) => {
     .skip(pageSize * (page - 1));
 
   res.status(200).json({ users, page, pages: Math.ceil(count / pageSize) });
-});
+}
 
 /**
  * @description Get one user
  * @route       GET /api/users/:id
  * @access      Private/Admin
  */
-const getUser = asyncHandler(async (req, res) => {
+const getUser = async (req, res) => {
   // Fetch the user without their password
   const user = await User.findById(req.params.id).select('-password');
 
@@ -152,14 +151,14 @@ const getUser = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('User not found');
   }
-});
+}
 
 /**
  * @description Delete one user
  * @route       DELETE /api/users/:id
  * @access      Private/Admin
  */
-const deleteUser = asyncHandler(async (req, res) => {
+const deleteUser = async (req, res) => {
   console.log('Hello from /api/users/:id delete');
   const user = await User.findById(req.params.id);
   if (user) {
@@ -173,14 +172,14 @@ const deleteUser = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('User not found');
   }
-});
+}
 
 /**
  * @description Update one user
  * @route       PUT /api/users/:id
  * @access      Private/Admin
  */
-const updateUser = asyncHandler(async (req, res) => {
+const updateUser = async (req, res) => {
   console.log('Hello from /api/users/:id update');
   const user = await User.findById(req.params.id);
 
@@ -200,7 +199,7 @@ const updateUser = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('User not found');
   }
-});
+}
 
 export {
   authUser,

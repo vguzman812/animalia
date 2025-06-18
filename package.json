@@ -28,6 +28,7 @@
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.0.0",
+    "mongodb-memory-server": "^10.1.4",
     "mongoose": "^7.5.1"
   },
   "devDependencies": {

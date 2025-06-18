@@ -1,4 +1,3 @@
-import asyncHandler from '../middleware/asyncHandler.js';
 import Fact from '../models/factModel.js';
 
 /**
@@ -6,7 +5,7 @@ import Fact from '../models/factModel.js';
  * @route       GET /api/facts
  * @access      Public
  */
-const getFacts = asyncHandler(async (req, res) => {
+const getFacts = async (req, res) => {
   const pageSize = process.env.PAGINATION_LIMIT;
   const page = Number(req.query.pageNumber) || 1;
   const keyword = req.query.keyword
@@ -24,14 +23,14 @@ const getFacts = asyncHandler(async (req, res) => {
     .skip(pageSize * (page - 1))
     .sort({ createdAt: -1 });
   res.status(200).json({ facts, page, pages: Math.ceil(count / pageSize) });
-});
+}
 
 /**
  * @description Fetch one product by id
  * @route       GET /api/facts/:id
  * @access      Public
  */
-const getFactById = asyncHandler(async (req, res) => {
+const getFactById = async (req, res) => {
   const fact = await Fact.findById(req.params.id);
   if (fact) {
     res.status(200).json(fact);
@@ -39,25 +38,25 @@ const getFactById = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Resource not found.');
   }
-});
+}
 /**
  * @description Get top liked facts
  * @route       GET /api/facts/top
  * @access      Public
  */
-const getTopFacts = asyncHandler(async (req, res) => {
+const getTopFacts = async (req, res) => {
   // Sorting facts by the number of likes in descending order and limiting to top 3
   const facts = await Fact.find({}).sort({ likes: -1 }).limit(3);
 
   res.status(200).json(facts);
-});
+}
 
 /**
  * @description Create fact
  * @route       POST /api/facts/create
  * @access      Private
  */
-const createFact = asyncHandler(async (req, res) => {
+const createFact = async (req, res) => {
   const { animal, source, text, media, wiki } = req.body;
 
   // Assuming that req.user._id is available (i.e., user is authenticated)
@@ -78,14 +77,14 @@ const createFact = asyncHandler(async (req, res) => {
     res.status(401);
     throw new Error('User not authorized');
   }
-});
+}
 
 /**
  * @description Get all facts from a certain user
  * @route       GET /api/facts/user/:userId
  * @access      Public
  */
-const getFactsByUser = asyncHandler(async (req, res) => {
+const getFactsByUser = async (req, res) => {
   const { userId } = req.params;
   const pageSize = process.env.PAGINATION_LIMIT;
   const page = Number(req.query.pageNumber) || 1;
@@ -108,14 +107,14 @@ const getFactsByUser = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Facts or user not found.');
   }
-});
+}
 
 /**
  * @description Edit fact
  * @route       PUT /api/facts/:id
  * @access      Private
  */
-const updateFact = asyncHandler(async (req, res) => {
+const updateFact = async (req, res) => {
   const { animal, source, text, media, wiki } = req.body;
 
   const fact = await Fact.findById(req.params.id);
@@ -141,13 +140,13 @@ const updateFact = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Resource not found.');
   }
-});
+}
 /**
  * @description Delete one fact
  * @route       DELETE /api/facts/:id
  * @access      Private
  */
-const deleteFact = asyncHandler(async (req, res) => {
+const deleteFact = async (req, res) => {
   const fact = await Fact.findById(req.params.id);
 
   if (fact) {
@@ -167,14 +166,14 @@ const deleteFact = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Resource not found.');
   }
-});
+}
 
 /**
  * @description Like/Unlike a fact
  * @route       POST /api/facts/:id/like
  * @access      Private
  */
-const likeFact = asyncHandler(async (req, res) => {
+const likeFact = async (req, res) => {
   const fact = await Fact.findById(req.params.id);
 
   if (fact) {
@@ -195,7 +194,7 @@ const likeFact = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Resource not found.');
   }
-});
+}
 
 export {
   getFactById,

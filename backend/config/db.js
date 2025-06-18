@@ -1,23 +1,62 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
+import { MongoMemoryServer } from "mongodb-memory-server";
 
-const MONGO_URI = process.NODE_ENV === 'test' ? process.env.MONGO_URI_TEST : process.env.MONGO_URI;
-// Define an asynchronous function to connect to MongoDB
-async function connectDb() {
-  try {
-    // Try connecting to MongoDB using the connection URI stored in an environment variable
-    // The await keyword waits for the operation to complete and stores the result in the variable 'conn'
-    let conn = await mongoose.connect(process.env.MONGO_URI);
+const { MONGO_CONN_STRING, MONGO_USERNAME, MONGO_PASSWORD } = process.env;
 
-    // Log a success message to the console, including the MongoDB host to which we've connected
-    console.log(`Mongo Connected: ${conn.connection.host}`);
-  } catch (error) {
-    // If the connection fails, log the error message to the console
-    console.error(`Error: ${error.message}`);
+let mongoServer = null;
 
-    // Terminate the Node.js process with a failure status (1)
-    process.exit(1);
-  }
-}
+const getUri = async () => {
+    // 1) Use the literal connection string if set
+    if (MONGO_CONN_STRING) return MONGO_CONN_STRING;
 
-// Export the connectDb function to be used in other parts of the application
-export default connectDb;
+    // 2) Build one from creds if both are set
+    if (MONGO_USERNAME && MONGO_PASSWORD) {
+        return `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@cluster0.wr9zgdy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+    }
+    // 3) Fall back to in-memory
+    console.log("No connection string found, starting in-memory instance...");
+    mongoServer = await MongoMemoryServer.create();
+    return mongoServer.getUri();
+};
+
+const connectDB = async () => {
+    try {
+        const uri = await getUri();
+        await mongoose.connect(uri);
+        console.log(`Connected to MongoDB${mongoServer ? " (in-memory)" : ""}`);
+    } catch (error) {
+        console.error("MongoDB connection error:", error);
+        process.exit(1);
+    }
+};
+
+// Cleanup function
+export const closeDB = async () => {
+    await mongoose.connection.close();
+    if (mongoServer) {
+        await mongoServer.stop();
+    }
+};
+
+// Handle MongoDB connection errors after initial connection
+mongoose.connection.on("error", (err) => {
+    console.error("MongoDB connection error:", err);
+});
+
+mongoose.connection.on("disconnected", () => {
+    console.log("MongoDB disconnected");
+});
+
+process.on("SIGINT", () => {
+    closeDB()
+        .then(() => {
+            console.log("MongoDB connection closed due to app termination");
+            process.exit(0);
+        })
+        .catch((err) => {
+            console.error("Error closing MongoDB connection:", err);
+            process.exit(1);
+        });
+});
+
+export default connectDB;
