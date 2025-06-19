@@ -9,7 +9,7 @@
         "outDir": "dist",
         "rootDir": "."
     },
-    // only compile .ts under backend/; leave your .js files alone
+    // only compile .ts under backend/; leave frontend files alone
     "include": ["backend/**/*.ts"],
-    "exclude": ["node_modules"]
+    "exclude": ["eslint.config.mjs", "node_modules", "dist", "frontend/**"]
 }

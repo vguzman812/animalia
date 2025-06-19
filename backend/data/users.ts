@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
+import type { User } from "../types/index.js"
 
-const sampleUsers = [
+const sampleUsers: User[] = [
   {
     name: 'Admin User',
     email: 'admin@email.com',

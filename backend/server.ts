@@ -8,10 +8,7 @@ import { notFound, errorHandler } from './middleware/errorHandler.js';
 import path from 'path';
 
 // Initialize port from environment variables or use 8888 as default
-const port = process.env.PORT || 8888;
-
-// Connect to database
-connectDb();
+const port = process.env['PORT'] || 8888;
 
 // Initialize Express application
 const app = Express();
@@ -31,17 +28,17 @@ app.use('/api/users', userRoutes);
 const __dirname = path.resolve();
 
 // Check if app is running in production environment
-if (process.env.NODE_ENV === 'production') {
+if (process.env['NODE_ENV'] === 'production') {
   // Set the static folder for serving frontend files
   app.use(Express.static(path.join(__dirname, '/frontend/dist')));
 
   // Any undefined route will serve index.html file
-  app.get('*', (req, res) =>
+  app.get('*', (_req, res) =>
     res.sendFile(path.resolve(__dirname, 'frontend', 'dist', 'index.html'))
   );
 } else {
   // Basic route for the root URL
-  app.get('/', (req, res) => {
+  app.get('/', (_req, res) => {
     console.log('Hello from /');
     res.send('API running');
   });
@@ -53,5 +50,13 @@ app.use(notFound);
 // Middleware for handling other errors
 app.use(errorHandler);
 
-// Start the Express server
-app.listen(port, () => console.log(`Server running on ${port}`));
+// Connect, then start
+connectDb()
+    .then(() => {
+        console.log("Database connected, starting server…");
+        app.listen(port, () => console.log(`Server running on ${port}`));
+    })
+    .catch((err) => {
+        console.error("Failed to connect to DB:", err);
+        process.exit(1);
+    });

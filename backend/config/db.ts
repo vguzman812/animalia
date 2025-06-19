@@ -3,9 +3,9 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 
 const { MONGO_CONN_STRING, MONGO_USERNAME, MONGO_PASSWORD } = process.env;
 
-let mongoServer = null;
+let mongoServer: MongoMemoryServer | null = null;
 
-const getUri = async () => {
+const getUri = async (): Promise<string> => {
     // 1) Use the literal connection string if set
     if (MONGO_CONN_STRING) return MONGO_CONN_STRING;
 
@@ -19,7 +19,7 @@ const getUri = async () => {
     return mongoServer.getUri();
 };
 
-const connectDB = async () => {
+const connectDB = async (): Promise<void> => {
     try {
         const uri = await getUri();
         await mongoose.connect(uri);

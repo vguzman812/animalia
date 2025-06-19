@@ -1,4 +1,6 @@
-const sampleFacts = [
+import type {Fact} from "../types/index.js"
+
+const sampleFacts: Fact[] = [
   {
     animal: 'aardvark',
     source: 'https://factanimal.com/aardvark/',

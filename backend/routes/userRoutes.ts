@@ -25,7 +25,7 @@ router.route('/login').post(asyncHandler(authUser));
 
 // Route for user logout
 // Access: Public (It's better if it's Private to invalidate token)
-router.route('/logout').post(asyncHandler(logoutUser));
+router.route('/logout').post(logoutUser);
 
 // Route to get and update user profile
 // Access: Private (only authenticated users)
