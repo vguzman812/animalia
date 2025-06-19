@@ -3,5 +3,13 @@
         "@tsconfig/strictest/tsconfig",
         "@tsconfig/node24/tsconfig.json",
         "@tsconfig/node-ts/tsconfig"
-    ]
+    ],
+    "compilerOptions": {
+        // put all compiled .js/.d.ts in dist/
+        "outDir": "dist",
+        "rootDir": "."
+    },
+    // only compile .ts under backend/; leave your .js files alone
+    "include": ["backend/**/*.ts"],
+    "exclude": ["node_modules"]
 }
