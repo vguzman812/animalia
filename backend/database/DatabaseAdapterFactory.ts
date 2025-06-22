@@ -1,8 +1,7 @@
-import type { IDatabaseAdapter, DatabaseConfig } from "../types/index.js";
-import { MongoDBAdapter } from "./adapters/MongoDBAdapter.js";
-import { PostgreSQLAdapter } from "./adapters/PostgreSQLAdapter.js";
-import { SQLiteAdapter } from "./adapters/SQLiteAdapter.js";
-import { MemoryAdapter } from "./adapters/MemoryAdapter.js";
+import type { IDatabaseAdapter, DatabaseConfig } from "../types/index.ts";
+import { MongoDBAdapter } from "./adapters/MongoDBAdapter.ts";
+import { PostgreSQLAdapter } from "./adapters/PostgreSQLAdapter.ts";
+import { MemoryAdapter } from "./adapters/MemoryAdapter.ts";
 
 export class DatabaseAdapterFactory {
     static createAdapter(config: DatabaseConfig): IDatabaseAdapter {
@@ -19,17 +18,11 @@ export class DatabaseAdapterFactory {
                 }
                 return new PostgreSQLAdapter(config.postgresql);
 
-            case "sqlite":
-                if (!config.sqlite) {
-                    throw new Error("SQLite configuration is required");
-                }
-                return new SQLiteAdapter(config.sqlite);
-
             case "memory":
                 return new MemoryAdapter();
 
             default:
-                throw new Error(`Unsupported database type: ${config.type}`);
+                throw new Error("Unsupported database type");
         }
     }
 }

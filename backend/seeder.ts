@@ -2,7 +2,7 @@ import "dotenv/config";
 import "colors";
 import sampleUsers from "./data/users.js";
 import sampleFacts from "./data/facts.js";
-import DatabaseManager from "./config/database.js";
+import DatabaseManager from "./config/db.js";
 
 // Function to populate the database with sample data
 const importData = async () => {

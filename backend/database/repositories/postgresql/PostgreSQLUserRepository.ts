@@ -1,7 +1,12 @@
 import type { Knex } from "knex";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
-import type { IUser, IUserRepository, PaginationOptions, IPaginatedResult } from "../../../../../../taskA/backend/types/index.ts";
+import type {
+    IUser,
+    IUserRepository,
+    PaginationOptions,
+    IPaginatedResult,
+} from "../../../types/index.ts";
 
 interface PostgreSQLUser {
     id: string;
@@ -14,9 +19,12 @@ interface PostgreSQLUser {
 }
 
 export class PostgreSQLUserRepository implements IUserRepository {
-    private readonly tableName = 'users';
+    private readonly tableName = "users";
+    private knex: Knex;
 
-    constructor(private knex: Knex) {}
+    constructor(knex: Knex) {
+        this.knex = knex;
+    }
 
     private convertToUser(pgUser: PostgreSQLUser): IUser {
         return {
@@ -30,7 +38,9 @@ export class PostgreSQLUserRepository implements IUserRepository {
         };
     }
 
-    private convertFromUser(user: Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>): Partial<PostgreSQLUser> {
+    private convertFromUser(
+        user: Omit<IUser, "id" | "createdAt" | "updatedAt">
+    ): Partial<PostgreSQLUser> {
         return {
             name: user.name,
             email: user.email,
@@ -41,7 +51,9 @@ export class PostgreSQLUserRepository implements IUserRepository {
 
     async findById(id: string): Promise<IUser | null> {
         try {
-            const user = await this.knex(this.tableName).where({ id }).first();
+            const user = await this.knex<PostgreSQLUser>(this.tableName)
+                .where({ id })
+                .first();
             return user ? this.convertToUser(user) : null;
         } catch (error) {
             console.error("Error finding user by id:", error);
@@ -51,7 +63,9 @@ export class PostgreSQLUserRepository implements IUserRepository {
 
     async findByEmail(email: string): Promise<IUser | null> {
         try {
-            const user = await this.knex(this.tableName).where({ email }).first();
+            const user = await this.knex<PostgreSQLUser>(this.tableName)
+                .where({ email })
+                .first();
             return user ? this.convertToUser(user) : null;
         } catch (error) {
             console.error("Error finding user by email:", error);
@@ -59,21 +73,24 @@ export class PostgreSQLUserRepository implements IUserRepository {
         }
     }
 
-    async create(userData: Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>): Promise<IUser> {
+    async create(
+        userData: Omit<IUser, "id" | "createdAt" | "updatedAt">
+    ): Promise<IUser> {
         try {
-            // Hash the password
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(userData.password, salt);
 
-            const pgUserData = {
+            const pgUserData: Partial<PostgreSQLUser> = {
                 ...this.convertFromUser(userData),
                 id: uuidv4(),
                 password: hashedPassword,
+                created_at: new Date(),
+                updated_at: new Date(),
             };
 
-            const [user] = await this.knex(this.tableName)
-                .insert(pgUserData)
-                .returning('*');
+            const [user] = await this.knex<PostgreSQLUser>(
+                this.tableName
+            ).insert(pgUserData, "*");
 
             return this.convertToUser(user);
         } catch (error) {
@@ -82,25 +99,31 @@ export class PostgreSQLUserRepository implements IUserRepository {
         }
     }
 
-    async update(id: string, userData: Partial<Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>>): Promise<IUser | null> {
+    async update(
+        id: string,
+        userData: Partial<Omit<IUser, "id" | "createdAt" | "updatedAt">>
+    ): Promise<IUser | null> {
         try {
             const updateData: Partial<PostgreSQLUser> = {};
 
             if (userData.name) updateData.name = userData.name;
             if (userData.email) updateData.email = userData.email;
-            if (userData.isAdmin !== undefined) updateData.is_admin = userData.isAdmin;
+            if (userData.isAdmin !== undefined)
+                updateData.is_admin = userData.isAdmin;
 
             if (userData.password) {
                 const salt = await bcrypt.genSalt(10);
-                updateData.password = await bcrypt.hash(userData.password, salt);
+                updateData.password = await bcrypt.hash(
+                    userData.password,
+                    salt
+                );
             }
 
             updateData.updated_at = new Date();
 
-            const [user] = await this.knex(this.tableName)
+            const [user] = await this.knex<PostgreSQLUser>(this.tableName)
                 .where({ id })
-                .update(updateData)
-                .returning('*');
+                .update(updateData, "*");
 
             return user ? this.convertToUser(user) : null;
         } catch (error) {
@@ -111,7 +134,9 @@ export class PostgreSQLUserRepository implements IUserRepository {
 
     async delete(id: string): Promise<boolean> {
         try {
-            const deletedCount = await this.knex(this.tableName).where({ id }).del();
+            const deletedCount = await this.knex<PostgreSQLUser>(this.tableName)
+                .where({ id })
+                .del();
             return deletedCount === 1;
         } catch (error) {
             console.error("Error deleting user:", error);
@@ -119,24 +144,29 @@ export class PostgreSQLUserRepository implements IUserRepository {
         }
     }
 
-    async findAll(options: PaginationOptions = {}): Promise<IPaginatedResult<IUser>> {
+    async findAll(
+        options: PaginationOptions = {}
+    ): Promise<IPaginatedResult<IUser>> {
         try {
-            const page = options.page || 1;
-            const limit = options.limit || 10;
+            const page = options.page ?? 1;
+            const limit = options.limit ?? 10;
             const offset = (page - 1) * limit;
 
             const [users, countResult] = await Promise.all([
-                this.knex(this.tableName)
-                    .select('*')
+                this.knex<PostgreSQLUser>(this.tableName)
+                    .select("*")
+                    .orderBy("created_at", "desc")
                     .limit(limit)
                     .offset(offset),
-                this.knex(this.tableName).count('* as count').first()
+                this.knex<PostgreSQLUser>(this.tableName)
+                    .count<{ count: string }[]>("* as count")
+                    .first(),
             ]);
 
-            const total = parseInt(countResult?.count as string || '0');
+            const total = countResult ? parseInt(countResult.count, 10) : 0;
 
             return {
-                data: users.map(user => this.convertToUser(user)),
+                data: users.map((u) => this.convertToUser(u)),
                 page,
                 pages: Math.ceil(total / limit),
                 total,
@@ -149,8 +179,10 @@ export class PostgreSQLUserRepository implements IUserRepository {
 
     async count(): Promise<number> {
         try {
-            const result = await this.knex(this.tableName).count('* as count').first();
-            return parseInt(result?.count as string || '0');
+            const result = await this.knex<PostgreSQLUser>(this.tableName)
+                .count<{ count: string }[]>("* as count")
+                .first();
+            return result ? parseInt(result.count, 10) : 0;
         } catch (error) {
             console.error("Error counting users:", error);
             return 0;

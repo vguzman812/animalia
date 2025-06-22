@@ -1,5 +1,8 @@
-import type { IFact, IFactRepository, PaginationOptions, IPaginatedResult } from "../../../../../../taskA/backend/types/index.ts";
-import { MongoFact, type IMongoFact } from "../../../../../../taskA/backend/database/models/mongodb/FactModel.ts";
+import type { IFact, IFactRepository, PaginationOptions, IPaginatedResult } from "../../../types/index.ts";
+import {
+    MongoFact,
+    type IMongoFact,
+} from "../../models/mongodb/factModel.ts"
 
 export class MongoDBFactRepository implements IFactRepository {
 
@@ -117,7 +120,7 @@ export class MongoDBFactRepository implements IFactRepository {
             if (!fact) return null;
 
             // Map the update data to MongoDB structure
-            const updateData: any = {};
+            const updateData: Record<string, unknown> = {};
             if (factData.userId) updateData.user = factData.userId;
             if (factData.animal) updateData.animal = factData.animal;
             if (factData.source) updateData.source = factData.source;

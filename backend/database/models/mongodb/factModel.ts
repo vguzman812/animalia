@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import type { IFact } from "../../types/index.ts";
+import type { IFact } from "../../../types/index.ts";
 
 // MongoDB-specific fact interface
 interface IMongoFact

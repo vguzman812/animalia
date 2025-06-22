@@ -1,4 +1,4 @@
-import knex, { Knex } from "knex";
+import knex, { type Knex } from "knex";
 import type { IDatabaseAdapter, IUserRepository, IFactRepository } from "../../types/index.ts";
 import { PostgreSQLUserRepository } from "../repositories/postgresql/PostgreSQLUserRepository.js";
 import { PostgreSQLFactRepository } from "../repositories/postgresql/PostgreSQLFactRepository.js";
@@ -81,8 +81,8 @@ export class PostgreSQLAdapter implements IDatabaseAdapter {
                 table.string('animal').notNullable();
                 table.text('source').notNullable();
                 table.text('text').notNullable();
-                table.string('media');
-                table.string('wiki');
+                table.text('media');
+                table.text('wiki');
                 table.specificType('likes', 'uuid[]').defaultTo('{}');
                 table.timestamps(true, true);
             });

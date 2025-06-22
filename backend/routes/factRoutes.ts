@@ -20,7 +20,7 @@ router.route('/').get(asyncHandler(getFacts));
 
 // Route to create a new fact
 // Access: Private (only authenticated users)
-router.route('/create').post(protect, asyncHandler(createFact));
+router.route('/create').post(asyncHandler(protect), asyncHandler(createFact));
 
 // Route to get top facts
 // Access: Public
@@ -31,12 +31,12 @@ router.route('/top').get(asyncHandler(getTopFacts));
 router
   .route('/:id')
   .get(asyncHandler(getFactById)) // Public
-  .put(protect, asyncHandler(updateFact)) // Private
-  .delete(protect, asyncHandler(deleteFact)); // Private
+  .put(asyncHandler(protect), asyncHandler(updateFact)) // Private
+  .delete(asyncHandler(protect), asyncHandler(deleteFact)); // Private
 
 // Route to like a fact by its ID
 // Access: Private (only authenticated users)
-router.route('/:id/like').post(protect, asyncHandler(likeFact));
+router.route('/:id/like').post(asyncHandler(protect), asyncHandler(likeFact));
 
 // Route to get facts by a user's ID
 // Access: Public

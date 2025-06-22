@@ -6,16 +6,16 @@ export class MemoryUserRepository implements IUserRepository {
     private users: Map<string, IUser> = new Map();
 
     async findById(id: string): Promise<IUser | null> {
-        return this.users.get(id) || null;
+        return Promise.resolve(this.users.get(id) || null);
     }
 
     async findByEmail(email: string): Promise<IUser | null> {
         for (const user of this.users.values()) {
             if (user.email === email) {
-                return user;
+                return Promise.resolve(user);
             }
         }
-        return null;
+        return Promise.resolve(null);
     }
 
     async create(userData: Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>): Promise<IUser> {
@@ -33,7 +33,7 @@ export class MemoryUserRepository implements IUserRepository {
         };
 
         this.users.set(user.id, user);
-        return user;
+        return Promise.resolve(user);
     }
 
     async update(id: string, userData: Partial<Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>>): Promise<IUser | null> {
@@ -54,11 +54,11 @@ export class MemoryUserRepository implements IUserRepository {
         };
 
         this.users.set(id, updatedUser);
-        return updatedUser;
+        return Promise.resolve(updatedUser);
     }
 
     async delete(id: string): Promise<boolean> {
-        return this.users.delete(id);
+        return Promise.resolve(this.users.delete(id));
     }
 
     async findAll(options: PaginationOptions = {}): Promise<IPaginatedResult<IUser>> {
@@ -69,16 +69,16 @@ export class MemoryUserRepository implements IUserRepository {
         const allUsers = Array.from(this.users.values());
         const paginatedUsers = allUsers.slice(offset, offset + limit);
 
-        return {
+        return Promise.resolve({
             data: paginatedUsers,
             page,
             pages: Math.ceil(allUsers.length / limit),
             total: allUsers.length,
-        };
+        });
     }
 
     async count(): Promise<number> {
-        return this.users.size;
+        return Promise.resolve(this.users.size);
     }
 
     clear(): void {

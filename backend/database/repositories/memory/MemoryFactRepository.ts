@@ -5,7 +5,8 @@ export class MemoryFactRepository implements IFactRepository {
     private facts: Map<string, IFact> = new Map();
 
     async findById(id: string): Promise<IFact | null> {
-        return this.facts.get(id) || null;
+        const fact =  this.facts.get(id) || null;
+        return Promise.resolve(fact)
     }
 
     async findAll(options: PaginationOptions & { keyword?: string } = {}): Promise<IPaginatedResult<IFact>> {
@@ -27,12 +28,13 @@ export class MemoryFactRepository implements IFactRepository {
 
         const paginatedFacts = allFacts.slice(offset, offset + limit);
 
-        return {
+
+        return Promise.resolve({
             data: paginatedFacts,
             page,
             pages: Math.ceil(allFacts.length / limit),
             total: allFacts.length,
-        };
+        });
     }
 
     async findByUserId(userId: string, options: PaginationOptions = {}): Promise<IPaginatedResult<IFact>> {
@@ -40,19 +42,19 @@ export class MemoryFactRepository implements IFactRepository {
         const limit = options.limit || 10;
         const offset = (page - 1) * limit;
 
-        let userFacts = Array.from(this.facts.values()).filter(fact => fact.userId === userId);
+        const userFacts = Array.from(this.facts.values()).filter(fact => fact.userId === userId);
 
         // Sort by creation date (newest first)
         userFacts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
         const paginatedFacts = userFacts.slice(offset, offset + limit);
 
-        return {
+        return Promise.resolve({
             data: paginatedFacts,
             page,
             pages: Math.ceil(userFacts.length / limit),
             total: userFacts.length,
-        };
+        });
     }
 
     async create(factData: Omit<IFact, 'id' | 'createdAt' | 'updatedAt'>): Promise<IFact> {
@@ -66,7 +68,7 @@ export class MemoryFactRepository implements IFactRepository {
         };
 
         this.facts.set(fact.id, fact);
-        return fact;
+        return Promise.resolve(fact);
     }
 
     async update(id: string, factData: Partial<Omit<IFact, 'id' | 'createdAt' | 'updatedAt'>>): Promise<IFact | null> {
@@ -80,11 +82,11 @@ export class MemoryFactRepository implements IFactRepository {
         };
 
         this.facts.set(id, updatedFact);
-        return updatedFact;
+        return Promise.resolve(updatedFact);
     }
 
     async delete(id: string): Promise<boolean> {
-        return this.facts.delete(id);
+        return Promise.resolve(this.facts.delete(id));
     }
 
     async getTopLiked(limit: number): Promise<IFact[]> {
@@ -93,7 +95,7 @@ export class MemoryFactRepository implements IFactRepository {
         // Sort by number of likes (descending)
         allFacts.sort((a, b) => b.likes.length - a.likes.length);
 
-        return allFacts.slice(0, limit);
+        return Promise.resolve(allFacts.slice(0, limit));
     }
 
     async count(keyword?: string): Promise<number> {
@@ -106,7 +108,7 @@ export class MemoryFactRepository implements IFactRepository {
             fact.animal.toLowerCase().includes(keyword.toLowerCase())
         );
 
-        return allFacts.length;
+        return Promise.resolve(allFacts.length);
     }
 
     clear(): void {

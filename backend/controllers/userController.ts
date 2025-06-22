@@ -161,6 +161,7 @@ const getUser = async (req: Request, res: Response) => {
 
     if (user) {
         // Return user without password
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password, ...userWithoutPassword } = user;
         res.status(200).json(userWithoutPassword);
     } else {

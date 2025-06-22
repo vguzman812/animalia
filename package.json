@@ -16,12 +16,7 @@
         "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
         "build:tsc": "tsc",
         "start": "node ./dist/backend/server.js",
-        "test:server": "NODE_ENV=test node --test",
-        "test:db": "npm run build:tsc && node test-db-connection.js",
-        "test:db:mongodb": "npm run build:tsc && node test-db-connection.js mongodb",
-        "test:db:postgresql": "npm run build:tsc && node test-db-connection.js postgresql",
-        "test:db:sqlite": "npm run build:tsc && node test-db-connection.js sqlite",
-        "test:db:memory": "npm run build:tsc && node test-db-connection.js memory"
+        "test:server": "NODE_ENV=test node --test"
     },
     "license": "MIT",
     "dependencies": {
@@ -34,12 +29,11 @@
         "globals": "^16.2.0",
         "helmet": "^7.0.0",
         "jsonwebtoken": "^9.0.2",
+        "knex": "^3.0.1",
         "mongodb": "^6.0.0",
         "mongodb-memory-server": "^10.1.4",
         "mongoose": "^7.5.1",
         "pg": "^8.11.3",
-        "sqlite3": "^5.1.6",
-        "knex": "^3.0.1",
         "uuid": "^9.0.1"
     },
     "devDependencies": {

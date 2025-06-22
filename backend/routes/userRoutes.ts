@@ -17,7 +17,7 @@ const router = express.Router();
 
 // Route to get all users and to register a new user
 // Access: getAllUsers is private and admin only, registerUser is public
-router.route('/').get(protect, admin, asyncHandler(getAllUsers)).post(asyncHandler(registerUser));
+router.route('/').get(asyncHandler(protect), admin, asyncHandler(getAllUsers)).post(asyncHandler(registerUser));
 
 // Route for user authentication (login)
 // Access: Public
@@ -29,14 +29,14 @@ router.route('/logout').post(logoutUser);
 
 // Route to get and update user profile
 // Access: Private (only authenticated users)
-router.route('/profile').get(protect, asyncHandler(getUserProfile)).put(protect, asyncHandler(updateUserProfile));
+router.route('/profile').get(asyncHandler(protect), asyncHandler(getUserProfile)).put(asyncHandler(protect), asyncHandler(updateUserProfile));
 
 // Route to get, delete, and update a user by their ID
 // Access: Private/Admin (only admin can delete or update other users)
 router
   .route('/:id')
-  .get(protect, admin, asyncHandler(getUser))
-  .delete(protect, admin, asyncHandler(deleteUser))
-  .put(protect, admin, asyncHandler(updateUser));
+  .get(asyncHandler(protect), admin, asyncHandler(getUser))
+  .delete(asyncHandler(protect), admin, asyncHandler(deleteUser))
+  .put(asyncHandler(protect), admin, asyncHandler(updateUser));
 
 export default router;

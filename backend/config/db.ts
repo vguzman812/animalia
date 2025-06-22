@@ -42,13 +42,7 @@ export class DatabaseManager {
                     password: process.env.POSTGRES_PASSWORD || "",
                 };
                 break;
-
-            case "sqlite":
-                config.sqlite = {
-                    path: process.env.SQLITE_PATH || "./database.sqlite",
-                };
-                break;
-
+                
             case "memory":
                 // No additional config needed for memory adapter
                 break;

@@ -1,5 +1,5 @@
-import type { IUser, IUserRepository, PaginationOptions, IPaginatedResult } from "../../../../../../taskA/backend/types/index.ts";
-import { MongoUser, type IMongoUser } from "../../../../../../taskA/backend/database/models/mongodb/UserModel.ts";
+import type { IUser, IUserRepository, PaginationOptions, IPaginatedResult } from "../../../types/index.ts";
+import { MongoUser, type IMongoUser } from "../../models/mongodb/userModel.ts";
 
 export class MongoDBUserRepository implements IUserRepository {
 

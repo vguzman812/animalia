@@ -1,6 +1,6 @@
 import mongoose, { Schema, Model } from "mongoose";
 import bcrypt from "bcryptjs";
-import type { IUser, IUserMethods } from "../../types/index.js";
+import type { IUser, IUserMethods } from "../../../types/index.ts";
 
 // MongoDB-specific user interface that extends the base IUser
 interface IMongoUser extends Omit<IUser, "id">, mongoose.Document {

@@ -1,7 +1,7 @@
 import Express from "express";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
-import DatabaseManager from "./config/database.js";
+import DatabaseManager from "./config/db.js";
 import factRoutes from "./routes/factRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";

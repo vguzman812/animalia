@@ -1,14 +1,12 @@
 import jwt from "jsonwebtoken";
-import DatabaseManager from "../config/database.js";
+import DatabaseManager from "../config/db.js";
 import type { Request, Response, NextFunction } from "express";
 import type { IAuthRequest, ITokenPayload } from "../types/index.js";
 
 // User must be authenticated
 const protect = async (req: Request, res: Response, next: NextFunction) => {
-    let token;
-
-    // Read the token from the cookie
-    token = req.cookies.jwt;
+    const token =
+        typeof req.cookies.jwt === "string" ? req.cookies.jwt : undefined;
 
     if (token) {
         try {
