@@ -20,11 +20,30 @@ const importData = async () => {
 
         console.log("Clearing existing data...");
 
-        // For MongoDB, we might need to implement a clear method
-        // For now, we'll get all users and facts and delete them individually
+        // Facts first
+        const totalFacts = await factRepository.count();
+        if (totalFacts > 0) {
+            const { data: allFacts } = await factRepository.findAll({
+                page: 1,
+                limit: totalFacts,
+            });
+            for (const fact of allFacts) {
+                await factRepository.delete(fact.id);
+            }
+        }
 
-        // NOTE: This is a simplified approach. For production, you might want to implement
-        // clearAll methods in your repositories or use database-specific bulk delete operations
+        // Then users
+        const totalUsers = await userRepository.count();
+        if (totalUsers > 0) {
+            const { data: allUsers } = await userRepository.findAll({
+                page: 1,
+                limit: totalUsers,
+            });
+            for (const user of allUsers) {
+                await userRepository.delete(user.id);
+            }
+        }
+        console.log("Existing data cleared.");
 
         console.log("Creating sample users...");
         const createdUsers = [];
@@ -77,14 +96,33 @@ const destroyData = async () => {
         const dbManager = DatabaseManager.getInstance();
         await dbManager.connect();
 
-        // NOTE: This is a simplified implementation
-        // In a real application, you'd want to implement proper clearAll methods
-        console.log(
-            "Clearing all data is not fully implemented in this database-agnostic version."
-        );
-        console.log(
-            "Please clear your database manually or implement clear methods in your repositories."
-        );
+        const userRepository = dbManager.getUserRepository();
+        const factRepository = dbManager.getFactRepository();
+
+        // actually delete everything
+        console.log("Deleting all facts...");
+        const factCount = await factRepository.count();
+        if (factCount > 0) {
+            const { data: facts } = await factRepository.findAll({
+                page: 1,
+                limit: factCount,
+            });
+            for (const f of facts) {
+                await factRepository.delete(f.id);
+            }
+        }
+
+        console.log("Deleting all users...");
+        const userCount = await userRepository.count();
+        if (userCount > 0) {
+            const { data: users } = await userRepository.findAll({
+                page: 1,
+                limit: userCount,
+            });
+            for (const u of users) {
+                await userRepository.delete(u.id);
+            }
+        }
 
         // Log a success message
         console.log("Data Destroy operation completed!".red.inverse);
