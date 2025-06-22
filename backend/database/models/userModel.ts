@@ -1,10 +1,15 @@
 import mongoose, { Schema, Model } from "mongoose";
 import bcrypt from "bcryptjs";
-import type { IUser, IUserMethods } from "../types/index.js";
+import type { IUser, IUserMethods } from "../../types/index.js";
+
+// MongoDB-specific user interface that extends the base IUser
+interface IMongoUser extends Omit<IUser, "id">, mongoose.Document {
+    _id: mongoose.Types.ObjectId;
+}
 
 const userSchema = new Schema<
-    IUser,
-    Model<IUser, unknown, IUserMethods>,
+    IMongoUser,
+    Model<IMongoUser, unknown, IUserMethods>,
     IUserMethods
 >(
     {
@@ -33,19 +38,21 @@ const userSchema = new Schema<
 );
 
 userSchema.methods.matchPassword = async function (
-    this: IUser,
+    this: IMongoUser,
     enteredPassword: string
-) {
-    return await bcrypt.compare(enteredPassword, this.password);
+): Promise<boolean> {
+    return bcrypt.compare(enteredPassword, this.password);
 };
+
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {
-        next();
+        return next();
     }
 
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
+    next();
 });
-const User = mongoose.model<IUser>("User", userSchema);
 
-export default User;
+export const MongoUser = mongoose.model<IMongoUser>("User", userSchema);
+export type { IMongoUser };

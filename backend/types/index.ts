@@ -1,8 +1,13 @@
 import type { Request } from "express";
-import type { Document, Types } from "mongoose";
+
+// Base entity interface
+export interface BaseEntity {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
 
 // User interfaces
-
 export interface User {
     name: string;
     email: string;
@@ -10,16 +15,11 @@ export interface User {
     isAdmin: boolean;
 }
 
-export interface IUser extends Document, IUserMethods, User {
-    _id: Types.ObjectId;
-    createdAt: Date;
-    updatedAt: Date;
-}
+export interface IUser extends BaseEntity, User {}
 
 export interface IUserMethods {
     matchPassword(enteredPassword: string): Promise<boolean>;
 }
-
 
 export interface IUserInput {
     name: string;
@@ -36,12 +36,9 @@ export interface Fact {
     wiki?: string;
 }
 
-export interface IFact extends Document, Fact {
-    _id: Types.ObjectId;
-    user: Types.ObjectId | IUser;
-    likes: Types.ObjectId[];
-    createdAt: Date;
-    updatedAt: Date;
+export interface IFact extends BaseEntity, Fact {
+    userId: string;
+    likes: string[];
 }
 
 // Request interfaces with user
@@ -57,7 +54,7 @@ export interface IPaginationQuery {
 
 // Response interfaces
 export interface IUserResponse {
-    _id: string;
+    id: string;
     name: string;
     email: string;
     isAdmin: boolean;
@@ -72,4 +69,83 @@ export interface IPaginatedResponse<T> {
 // Token payload
 export interface ITokenPayload {
     userId: string;
+}
+
+// Repository interfaces
+export interface IUserRepository {
+    findById(id: string): Promise<IUser | null>;
+    findByEmail(email: string): Promise<IUser | null>;
+    create(
+        userData: Omit<IUser, "id" | "createdAt" | "updatedAt">
+    ): Promise<IUser>;
+    update(
+        id: string,
+        userData: Partial<Omit<IUser, "id" | "createdAt" | "updatedAt">>
+    ): Promise<IUser | null>;
+    delete(id: string): Promise<boolean>;
+    findAll(options?: PaginationOptions): Promise<IPaginatedResult<IUser>>;
+    count(): Promise<number>;
+}
+
+export interface IFactRepository {
+    findById(id: string): Promise<IFact | null>;
+    findAll(
+        options?: PaginationOptions & { keyword?: string }
+    ): Promise<IPaginatedResult<IFact>>;
+    findByUserId(
+        userId: string,
+        options?: PaginationOptions
+    ): Promise<IPaginatedResult<IFact>>;
+    create(
+        factData: Omit<IFact, "id" | "createdAt" | "updatedAt">
+    ): Promise<IFact>;
+    update(
+        id: string,
+        factData: Partial<Omit<IFact, "id" | "createdAt" | "updatedAt">>
+    ): Promise<IFact | null>;
+    delete(id: string): Promise<boolean>;
+    getTopLiked(limit: number): Promise<IFact[]>;
+    count(keyword?: string): Promise<number>;
+}
+
+export interface PaginationOptions {
+    page?: number;
+    limit?: number;
+}
+
+export interface IPaginatedResult<T> {
+    data: T[];
+    page: number;
+    pages: number;
+    total: number;
+}
+
+// Database configuration
+export type DatabaseType = "mongodb" | "postgresql" | "sqlite" | "memory" ;
+
+export interface DatabaseConfig {
+    type: DatabaseType;
+    mongodb?: {
+        connectionString?: string;
+        username?: string;
+        password?: string;
+    };
+    postgresql?: {
+        host: string;
+        port: number;
+        database: string;
+        username: string;
+        password: string;
+    };
+    sqlite?: {
+        path: string;
+    };
+}
+
+// Database adapter interface
+export interface IDatabaseAdapter {
+    connect(): Promise<void>;
+    disconnect(): Promise<void>;
+    getUserRepository(): IUserRepository;
+    getFactRepository(): IFactRepository;
 }

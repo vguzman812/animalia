@@ -1,39 +1,40 @@
-import FactModel from "../models/factModel.ts";
+import DatabaseManager from "../config/db.js";
 import type { Request, Response } from "express";
-import { Types } from "mongoose";
 import type { IAuthRequest, IFact } from "../types/index.js";
+
 /**
- * @description Fetch all products
+ * @description Fetch all facts
  * @route       GET /api/facts
  * @access      Public
  */
 const getFacts = async (req: Request, res: Response) => {
     const pageSize = Number(process.env["PAGINATION_LIMIT"]) || 10;
     const page = Number(req.query["pageNumber"]) || 1;
-    const keyword = req.query["keyword"]
-        ? {
-              animal: {
-                  $regex: req.query["keyword"],
-                  $options: "i",
-              },
-          }
-        : {};
+    const keyword = req.query["keyword"] as string;
 
-    const count = await FactModel.countDocuments({ ...keyword });
-    const facts = await FactModel.find({ ...keyword })
-        .limit(pageSize)
-        .skip(pageSize * (page - 1))
-        .sort({ createdAt: -1 });
-    res.status(200).json({ facts, page, pages: Math.ceil(count / pageSize) });
+    const factRepository = DatabaseManager.getInstance().getFactRepository();
+    const result = await factRepository.findAll({
+        page,
+        limit: pageSize,
+        keyword,
+    });
+
+    res.status(200).json({
+        facts: result.data,
+        page: result.page,
+        pages: result.pages,
+    });
 };
 
 /**
- * @description Fetch one product by id
+ * @description Fetch one fact by id
  * @route       GET /api/facts/:id
  * @access      Public
  */
 const getFactById = async (req: Request, res: Response) => {
-    const fact = await FactModel.findById(req.params["id"]);
+    const factRepository = DatabaseManager.getInstance().getFactRepository();
+    const fact = await factRepository.findById(req.params["id"] || "");
+
     if (fact) {
         res.status(200).json(fact);
     } else {
@@ -41,14 +42,15 @@ const getFactById = async (req: Request, res: Response) => {
         throw new Error("Resource not found.");
     }
 };
+
 /**
  * @description Get top liked facts
  * @route       GET /api/facts/top
  * @access      Public
  */
 const getTopFacts = async (_req: Request, res: Response) => {
-    // Sorting facts by the number of likes in descending order and limiting to top 3
-    const facts = await FactModel.find({}).sort({ likes: -1 }).limit(3);
+    const factRepository = DatabaseManager.getInstance().getFactRepository();
+    const facts = await factRepository.getTopLiked(3);
 
     res.status(200).json(facts);
 };
@@ -61,18 +63,20 @@ const getTopFacts = async (_req: Request, res: Response) => {
 const createFact = async (req: IAuthRequest, res: Response) => {
     const { animal, source, text, media, wiki } = req.body as IFact;
 
-    // Assuming that req.user._id is available (i.e., user is authenticated)
-    if (req.user && req.user._id) {
-        const fact = new FactModel({
-            user: req.user._id,
+    // Assuming that req.user.id is available (i.e., user is authenticated)
+    if (req.user && req.user.id) {
+        const factRepository =
+            DatabaseManager.getInstance().getFactRepository();
+
+        const createdFact = await factRepository.create({
+            userId: req.user.id,
             animal,
             source,
             text,
             media,
             wiki,
+            likes: [],
         });
-
-        const createdFact = await fact.save();
 
         res.status(201).json(createdFact);
     } else {
@@ -91,23 +95,17 @@ const getFactsByUser = async (req: Request, res: Response) => {
     const pageSize = Number(process.env["PAGINATION_LIMIT"]) || 10;
     const page = Number(req.query["pageNumber"]) || 1;
 
-    // Find facts by user ID
-    const count = await FactModel.countDocuments({ user: userId });
-    const facts = await FactModel.find({ user: userId })
-        .sort({ createdAt: -1 })
-        .limit(pageSize)
-        .skip(pageSize * (page - 1));
+    const factRepository = DatabaseManager.getInstance().getFactRepository();
+    const result = await factRepository.findByUserId(userId, {
+        page,
+        limit: pageSize,
+    });
 
-    if (facts) {
-        res.status(200).json({
-            facts,
-            page,
-            pages: Math.ceil(count / pageSize),
-        });
-    } else {
-        res.status(404);
-        throw new Error("Facts or user not found.");
-    }
+    res.status(200).json({
+        facts: result.data,
+        page: result.page,
+        pages: result.pages,
+    });
 };
 
 /**
@@ -117,32 +115,32 @@ const getFactsByUser = async (req: Request, res: Response) => {
  */
 const updateFact = async (req: IAuthRequest, res: Response) => {
     const { animal, source, text, media, wiki } = req.body as IFact;
+    const factRepository = DatabaseManager.getInstance().getFactRepository();
 
-    const fact = await FactModel.findById(req.params["id"]);
+    const fact = await factRepository.findById(req.params["id"] || "");
 
     if (fact) {
-        // Authorization check: Make sure the user owns the fact they are trying to updatew new Error("User not authorized to edit this fact");
-        const ownerId: Types.ObjectId =
-            fact.user instanceof Types.ObjectId ? fact.user : fact.user._id;
-        if (!ownerId.equals(req.user!._id)) {
+        // Authorization check: Make sure the user owns the fact they are trying to update
+        if (fact.userId !== req.user?.id) {
             res.status(401);
             throw new Error("User not authorized to edit this fact");
         }
 
         // Update fields
-        fact.animal = animal || fact.animal;
-        fact.source = source || fact.source;
-        fact.text = text || fact.text;
-        if (media !== undefined) {
-            fact.media = media;
-        }
-        if (wiki !== undefined) {
-            fact.wiki = wiki;
-        }
+        const updatedFact = await factRepository.update(fact.id, {
+            animal: animal || fact.animal,
+            source: source || fact.source,
+            text: text || fact.text,
+            media: media !== undefined ? media : fact.media,
+            wiki: wiki !== undefined ? wiki : fact.wiki,
+        });
 
-        const updatedFact = await fact.save();
-
-        res.status(200).json(updatedFact);
+        if (updatedFact) {
+            res.status(200).json(updatedFact);
+        } else {
+            res.status(500);
+            throw new Error("Failed to update fact");
+        }
     } else {
         res.status(404);
         throw new Error("Resource not found.");
@@ -155,23 +153,23 @@ const updateFact = async (req: IAuthRequest, res: Response) => {
  * @access      Private
  */
 const deleteFact = async (req: IAuthRequest, res: Response) => {
-    const fact = await FactModel.findById(req.params["id"]);
+    const factRepository = DatabaseManager.getInstance().getFactRepository();
+    const fact = await factRepository.findById(req.params["id"] || "");
 
     if (fact) {
         // Authorization check: Make sure the user owns the fact they are trying to delete
-        const ownerId: Types.ObjectId =
-            fact.user instanceof Types.ObjectId ? fact.user : fact.user._id;
-        if (!ownerId.equals(req.user!._id)) {
+        if (fact.userId !== req.user?.id) {
             res.status(401);
             throw new Error("User not authorized to delete this fact");
         }
 
-        await FactModel.deleteOne({ _id: fact._id }).catch(() => {
+        const deleted = await factRepository.delete(fact.id);
+        if (deleted) {
+            res.status(200).json({ message: "Fact deleted." });
+        } else {
             res.status(500);
-            throw new Error("Internal Server Error");
-        });
-
-        res.status(200).json({ message: "Fact deleted." });
+            throw new Error("Failed to delete fact");
+        }
     } else {
         res.status(404);
         throw new Error("Resource not found.");
@@ -184,26 +182,34 @@ const deleteFact = async (req: IAuthRequest, res: Response) => {
  * @access      Private
  */
 const likeFact = async (req: IAuthRequest, res: Response) => {
-    const fact = await FactModel.findById(req.params["id"]);
+    const factRepository = DatabaseManager.getInstance().getFactRepository();
+    const fact = await factRepository.findById(req.params["id"] || "");
 
-    if (fact && req.user?._id) {
+    if (fact && req.user?.id) {
         // Check if the user has already liked this fact
-        const alreadyLiked = fact.likes.some(
-            (likeId) => likeId.toString() === req.user?._id.toString()
-        );
+        const alreadyLiked = fact.likes.includes(req.user.id);
 
+        let updatedLikes: string[];
         if (alreadyLiked) {
             // Remove the like
-            fact.likes = fact.likes.filter(
-                (likeId) => likeId.toString() !== req.user?._id.toString()
+            updatedLikes = fact.likes.filter(
+                (likeId) => likeId !== req.user!.id
             );
         } else {
             // Add the like
-            fact.likes.push(req.user._id);
+            updatedLikes = [...fact.likes, req.user.id];
         }
 
-        await fact.save();
-        res.status(200).json(fact);
+        const updatedFact = await factRepository.update(fact.id, {
+            likes: updatedLikes,
+        });
+
+        if (updatedFact) {
+            res.status(200).json(updatedFact);
+        } else {
+            res.status(500);
+            throw new Error("Failed to update fact");
+        }
     } else {
         res.status(404);
         throw new Error("Resource not found.");

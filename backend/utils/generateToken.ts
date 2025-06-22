@@ -1,10 +1,9 @@
 // Import jwt for token generation
 import jwt from "jsonwebtoken";
 import type { Response } from "express";
-import type { Types } from "mongoose";
 
 // Function to generate a JWT token and set it as an HTTP-only cookie
-const generateToken = (res: Response, userId: string | Types.ObjectId) => {
+const generateToken = (res: Response, userId: string) => {
     // Make sure our secret is actually set
     const secret = process.env["JWT_SECRET"];
     if (!secret) {
@@ -13,7 +12,7 @@ const generateToken = (res: Response, userId: string | Types.ObjectId) => {
 
     // Create a JWT token
     const token = jwt.sign(
-        { userId: userId.toString() },
+        { userId },
         secret,
         { expiresIn: "1d" } // Token expires in 1 day
     );

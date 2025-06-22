@@ -1,5 +1,6 @@
-import User from "../models/userModel.ts";
-import generateToken from "../utils/generateToken.ts";
+import DatabaseManager from "../config/db.js";
+import generateToken from "../utils/generateToken.js";
+import bcrypt from "bcryptjs";
 import type { Request, Response } from "express";
 import type { IAuthRequest, IUserInput } from "../types/index.js";
 
@@ -10,11 +11,13 @@ import type { IAuthRequest, IUserInput } from "../types/index.js";
  */
 const authUser = async (req: Request, res: Response) => {
     const { email, password } = req.body as IUserInput;
-    const user = await User.findOne({ email });
-    if (user && (await user.matchPassword(password))) {
-        generateToken(res, user._id);
+    const userRepository = DatabaseManager.getInstance().getUserRepository();
+
+    const user = await userRepository.findByEmail(email);
+    if (user && (await bcrypt.compare(password, user.password))) {
+        generateToken(res, user.id);
         res.status(200).json({
-            _id: user._id,
+            id: user.id,
             name: user.name,
             email: user.email,
             isAdmin: user.isAdmin,
@@ -32,22 +35,26 @@ const authUser = async (req: Request, res: Response) => {
  */
 const registerUser = async (req: Request, res: Response) => {
     const { name, email, password } = req.body as IUserInput;
+    const userRepository = DatabaseManager.getInstance().getUserRepository();
+
     // Check for user existence via email
-    const userExists = await User.findOne({ email });
+    const userExists = await userRepository.findByEmail(email);
     if (userExists) {
         res.status(400);
         throw new Error("User already exists.");
     } else {
         // Create a new user if the email doesn't exist
-        const user = await User.create({
+        const user = await userRepository.create({
             name,
             email,
             password,
+            isAdmin: false,
         });
+
         if (user) {
-            generateToken(res, user._id);
+            generateToken(res, user.id);
             res.status(201).json({
-                _id: user._id,
+                id: user.id,
                 name: user.name,
                 email: user.email,
                 isAdmin: user.isAdmin,
@@ -79,12 +86,13 @@ const logoutUser = (_req: Request, res: Response) => {
  * @access      Private
  */
 const getUserProfile = async (req: IAuthRequest, res: Response) => {
-    const user = await User.findById(req.user?._id);
+    const userRepository = DatabaseManager.getInstance().getUserRepository();
+    const user = await userRepository.findById(req.user?.id || "");
 
     if (user) {
-        generateToken(res, user._id);
+        generateToken(res, user.id);
         res.status(200).json({
-            _id: user._id,
+            id: user.id,
             name: user.name,
             email: user.email,
             isAdmin: user.isAdmin,
@@ -101,24 +109,25 @@ const getUserProfile = async (req: IAuthRequest, res: Response) => {
  * @access      Private
  */
 const updateUserProfile = async (req: IAuthRequest, res: Response) => {
-    const user = await User.findById(req.user?._id);
+    const userRepository = DatabaseManager.getInstance().getUserRepository();
+    const { name, email, password } = req.body as Partial<IUserInput>;
 
-    if (user) {
-        const { name, email, password } = req.body as Partial<IUserInput>;
-        user.name = name || user.name;
-        user.email = email || user.email;
-        if (password) {
-            user.password = password;
-        }
+    const updatedUser = await userRepository.update(req.user?.id || "", {
+        name,
+        email,
+        password,
+    });
 
-        const updatedUser = await user.save();
-
+    if (updatedUser) {
         res.status(200).json({
-            id: updatedUser._id,
+            id: updatedUser.id,
             name: updatedUser.name,
             email: updatedUser.email,
             isAdmin: updatedUser.isAdmin,
         });
+    } else {
+        res.status(404);
+        throw new Error("User not found");
     }
 };
 
@@ -130,12 +139,15 @@ const updateUserProfile = async (req: IAuthRequest, res: Response) => {
 const getAllUsers = async (req: Request, res: Response) => {
     const pageSize = Number(process.env["PAGINATION_LIMIT"]) || 10;
     const page = Number(req.query["pageNumber"]) || 1;
-    const count = await User.countDocuments();
-    const users = await User.find({})
-        .limit(pageSize)
-        .skip(pageSize * (page - 1));
 
-    res.status(200).json({ users, page, pages: Math.ceil(count / pageSize) });
+    const userRepository = DatabaseManager.getInstance().getUserRepository();
+    const result = await userRepository.findAll({ page, limit: pageSize });
+
+    res.status(200).json({
+        users: result.data,
+        page: result.page,
+        pages: result.pages,
+    });
 };
 
 /**
@@ -144,11 +156,13 @@ const getAllUsers = async (req: Request, res: Response) => {
  * @access      Private/Admin
  */
 const getUser = async (req: Request, res: Response) => {
-    // Fetch the user without their password
-    const user = await User.findById(req.params["id"]).select("-password");
+    const userRepository = DatabaseManager.getInstance().getUserRepository();
+    const user = await userRepository.findById(req.params["id"] || "");
 
     if (user) {
-        res.status(200).json(user);
+        // Return user without password
+        const { password, ...userWithoutPassword } = user;
+        res.status(200).json(userWithoutPassword);
     } else {
         res.status(404);
         throw new Error("User not found");
@@ -162,14 +176,22 @@ const getUser = async (req: Request, res: Response) => {
  */
 const deleteUser = async (req: Request, res: Response) => {
     console.log("Hello from /api/users/:id delete");
-    const user = await User.findById(req.params["id"]);
+    const userRepository = DatabaseManager.getInstance().getUserRepository();
+    const user = await userRepository.findById(req.params["id"] || "");
+
     if (user) {
         if (user.isAdmin) {
             res.status(400);
             throw new Error("Cannot delete admin user");
         }
-        await User.deleteOne({ _id: user._id });
-        res.status(200).json({ message: "User successfully deleted." });
+
+        const deleted = await userRepository.delete(user.id);
+        if (deleted) {
+            res.status(200).json({ message: "User successfully deleted." });
+        } else {
+            res.status(500);
+            throw new Error("Failed to delete user.");
+        }
     } else {
         res.status(404);
         throw new Error("User not found");
@@ -183,19 +205,20 @@ const deleteUser = async (req: Request, res: Response) => {
  */
 const updateUser = async (req: Request, res: Response) => {
     console.log("Hello from /api/users/:id update");
-    const user = await User.findById(req.params["id"]);
+    const userRepository = DatabaseManager.getInstance().getUserRepository();
+    const { name, email, isAdmin } = req.body as Partial<
+        IUserInput & { isAdmin: boolean }
+    >;
 
-    if (user) {
-        const { name, email, isAdmin } = req.body as Partial<
-            IUserInput & { isAdmin: boolean }
-        >;
-        user.name = name || user.name;
-        user.email = email || user.email;
-        user.isAdmin = isAdmin ?? user.isAdmin;
+    const updatedUser = await userRepository.update(req.params["id"] || "", {
+        name,
+        email,
+        isAdmin,
+    });
 
-        const updatedUser = await user.save();
+    if (updatedUser) {
         res.status(200).json({
-            _id: updatedUser._id,
+            id: updatedUser.id,
             name: updatedUser.name,
             email: updatedUser.email,
             isAdmin: updatedUser.isAdmin,

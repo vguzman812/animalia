@@ -1,13 +1,21 @@
-import mongoose from "mongoose";
-import User from "./userModel.js";
-import type { IFact } from "../types/index.js";
+import mongoose, { Schema } from "mongoose";
+import type { IFact } from "../../types/index.ts";
 
-const factSchema = new mongoose.Schema<IFact>(
+// MongoDB-specific fact interface
+interface IMongoFact
+    extends Omit<IFact, "id" | "userId" | "likes">,
+        mongoose.Document {
+    _id: mongoose.Types.ObjectId;
+    user: mongoose.Types.ObjectId;
+    likes: mongoose.Types.ObjectId[];
+}
+
+const factSchema = new Schema<IMongoFact>(
     {
         user: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
-            ref: User,
+            ref: "User",
         },
         animal: {
             type: String,
@@ -41,6 +49,5 @@ const factSchema = new mongoose.Schema<IFact>(
     }
 );
 
-const Fact = mongoose.model<IFact>("Fact", factSchema);
-
-export default Fact;
+export const MongoFact = mongoose.model<IMongoFact>("Fact", factSchema);
+export type { IMongoFact };

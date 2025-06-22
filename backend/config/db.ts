@@ -1,62 +1,112 @@
-import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import type {
+    DatabaseConfig,
+    DatabaseType,
+    IDatabaseAdapter,
+} from "../types/index.js";
+import { DatabaseAdapterFactory } from "../database/DatabaseAdapterFactory.js";
 
-const { MONGO_CONN_STRING, MONGO_USERNAME, MONGO_PASSWORD } = process.env;
+export class DatabaseManager {
+    private static instance: DatabaseManager;
+    private adapter: IDatabaseAdapter | null = null;
 
-let mongoServer: MongoMemoryServer | null = null;
+    private constructor() {}
 
-const getUri = async (): Promise<string> => {
-    // 1) Use the literal connection string if set
-    if (MONGO_CONN_STRING) return MONGO_CONN_STRING;
-
-    // 2) Build one from creds if both are set
-    if (MONGO_USERNAME && MONGO_PASSWORD) {
-        return `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@cluster0.wr9zgdy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+    static getInstance(): DatabaseManager {
+        if (!DatabaseManager.instance) {
+            DatabaseManager.instance = new DatabaseManager();
+        }
+        return DatabaseManager.instance;
     }
-    // 3) Fall back to in-memory
-    console.log("No connection string found, starting in-memory instance...");
-    mongoServer = await MongoMemoryServer.create();
-    return mongoServer.getUri();
-};
 
-const connectDB = async (): Promise<void> => {
-    try {
-        const uri = await getUri();
-        await mongoose.connect(uri);
-        console.log(`Connected to MongoDB${mongoServer ? " (in-memory)" : ""}`);
-    } catch (error) {
-        console.error("MongoDB connection error:", error);
-        process.exit(1);
+    private getConfig(): DatabaseConfig {
+        const {DATABASE_TYPE} = process.env
+        const databaseType: DatabaseType = DATABASE_TYPE ? DATABASE_TYPE as DatabaseType : "memory"
+
+        const config: DatabaseConfig = { type: databaseType };
+
+        switch (databaseType) {
+            case "mongodb":
+                config.mongodb = {
+                    connectionString: process.env.MONGO_CONN_STRING,
+                    username: process.env.MONGO_USERNAME,
+                    password: process.env.MONGO_PASSWORD,
+                };
+                break;
+
+            case "postgresql":
+                config.postgresql = {
+                    host: process.env.POSTGRES_HOST || "localhost",
+                    port: parseInt(process.env.POSTGRES_PORT || "5432"),
+                    database: process.env.POSTGRES_DB || "animalia",
+                    username: process.env.POSTGRES_USER || "",
+                    password: process.env.POSTGRES_PASSWORD || "",
+                };
+                break;
+
+            case "sqlite":
+                config.sqlite = {
+                    path: process.env.SQLITE_PATH || "./database.sqlite",
+                };
+                break;
+
+            case "memory":
+                // No additional config needed for memory adapter
+                break;
+
+            default:
+                throw new Error(`Unsupported database type.`);
+        }
+
+        return config;
     }
-};
 
-// Cleanup function
-export const closeDB = async () => {
-    await mongoose.connection.close();
-    if (mongoServer) {
-        await mongoServer.stop();
-    }
-};
+    async connect(): Promise<void> {
+        if (this.adapter) {
+            console.log("Database already connected");
+            return;
+        }
 
-// Handle MongoDB connection errors after initial connection
-mongoose.connection.on("error", (err) => {
-    console.error("MongoDB connection error:", err);
-});
+        const config = this.getConfig();
+        this.adapter = DatabaseAdapterFactory.createAdapter(config);
+        await this.adapter.connect();
 
-mongoose.connection.on("disconnected", () => {
-    console.log("MongoDB disconnected");
-});
-
-process.on("SIGINT", () => {
-    closeDB()
-        .then(() => {
-            console.log("MongoDB connection closed due to app termination");
-            process.exit(0);
-        })
-        .catch((err) => {
-            console.error("Error closing MongoDB connection:", err);
-            process.exit(1);
+        // Setup cleanup on process termination
+        process.on("SIGINT", () => {
+            this.disconnect()
+                .then(() => {
+                    console.log(
+                        "Database connection closed due to app termination"
+                    );
+                    process.exit(0);
+                })
+                .catch((err) => {
+                    console.error("Error closing database connection:", err);
+                    process.exit(1);
+                });
         });
-});
+    }
 
-export default connectDB;
+    async disconnect(): Promise<void> {
+        if (this.adapter) {
+            await this.adapter.disconnect();
+            this.adapter = null;
+        }
+    }
+
+    getAdapter(): IDatabaseAdapter {
+        if (!this.adapter) {
+            throw new Error("Database not connected. Call connect() first.");
+        }
+        return this.adapter;
+    }
+
+    getUserRepository() {
+        return this.getAdapter().getUserRepository();
+    }
+
+    getFactRepository() {
+        return this.getAdapter().getFactRepository();
+    }
+}
+
+export default DatabaseManager;

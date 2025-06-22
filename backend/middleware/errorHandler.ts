@@ -4,7 +4,6 @@ import type {
     NextFunction,
     ErrorRequestHandler,
 } from "express";
-import mongoose from "mongoose";
 
 /**
  * @description Middleware for handling "Not Found" errors.
@@ -37,10 +36,25 @@ export const errorHandler: ErrorRequestHandler = (
     let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
     let message = err.message;
 
-    // Check for a Mongoose CastError related to ObjectId
-    if (err instanceof mongoose.Error.CastError && err.kind === "ObjectId") {
+    // Check for common database-specific errors and normalize them
+    if (err.name === "CastError" || (err.kind && err.kind === "ObjectId")) {
         message = "Resource not found.";
         statusCode = 404;
+    }
+
+    // Handle validation errors
+    if (err.name === "ValidationError") {
+        message = "Invalid data provided.";
+        statusCode = 400;
+    }
+
+    // Handle duplicate key errors (common across databases)
+    if (
+        (err.message && err.message.includes("duplicate")) ||
+        err.message.includes("unique")
+    ) {
+        message = "Duplicate entry found.";
+        statusCode = 400;
     }
 
     // Send the response with the determined status code, error message,

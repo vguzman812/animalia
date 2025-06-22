@@ -1,62 +1,52 @@
 import jwt from "jsonwebtoken";
-import type { Response, NextFunction } from "express";
-import asyncHandler from "./asyncHandler.js";
-import User from "../models/userModel.js";
+import DatabaseManager from "../config/database.js";
+import type { Request, Response, NextFunction } from "express";
 import type { IAuthRequest, ITokenPayload } from "../types/index.js";
 
-/**
- * @description Middleware to protect routes. It verifies the JWT token
- *              and adds the user object to the request.
- */
-export const protect = asyncHandler(
-    async (req: IAuthRequest, res: Response, next: NextFunction) => {
-        // Read the JWT from the cookie
-        const token = req.cookies["jwt"] as string | undefined;
+// User must be authenticated
+const protect = async (req: Request, res: Response, next: NextFunction) => {
+    let token;
 
-        if (token) {
-            try {
-                // Verify the token and decode its payload
-                const jwtSecret = process.env["JWT_SECRET"];
-                if (!jwtSecret) {
-                    res.status(500);
-                    throw new Error("JWT_SECRET is not configured");
-                }
+    // Read the token from the cookie
+    token = req.cookies.jwt;
 
-                const decoded = jwt.verify(token, jwtSecret) as ITokenPayload;
+    if (token) {
+        try {
+            const decoded = jwt.verify(
+                token,
+                process.env["JWT_SECRET"] || ""
+            ) as ITokenPayload;
+            const userRepository =
+                DatabaseManager.getInstance().getUserRepository();
+            const user = await userRepository.findById(decoded.userId);
 
-                // Find the user corresponding to the decoded userId
-                // and attach it to the request object
-                const user = await User.findById(decoded.userId).select(
-                    "-password"
-                );
-
-                if (!user) {
-                    res.status(401);
-                    throw new Error("Not authorized, user not found.");
-                }
-
-                req.user = user;
+            if (user) {
+                (req as IAuthRequest).user = user;
                 next();
-            } catch (error) {
-                console.error(error);
+            } else {
                 res.status(401);
-                throw new Error("Not authorized, token failed.");
+                throw new Error("Not authorized, user not found");
             }
-        } else {
+        } catch (error) {
+            console.error(error);
             res.status(401);
-            throw new Error("Not authorized, no token.");
+            throw new Error("Not authorized, token failed");
         }
+    } else {
+        res.status(401);
+        throw new Error("Not authorized, no token");
     }
-);
+};
 
-/**
- * @description Middleware to check if the user is an admin.
- */
-export const admin = (req: IAuthRequest, res: Response, next: NextFunction) => {
-    if (req.user && req.user.isAdmin) {
+// User must be an admin
+const admin = (req: Request, res: Response, next: NextFunction) => {
+    const authReq = req as IAuthRequest;
+    if (authReq.user && authReq.user.isAdmin) {
         next();
     } else {
         res.status(401);
-        throw new Error("Not authorized as admin.");
+        throw new Error("Not authorized as an admin");
     }
 };
+
+export { protect, admin };

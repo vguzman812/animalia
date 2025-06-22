@@ -16,7 +16,12 @@
         "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
         "build:tsc": "tsc",
         "start": "node ./dist/backend/server.js",
-        "test:server": "NODE_ENV=test node --test"
+        "test:server": "NODE_ENV=test node --test",
+        "test:db": "npm run build:tsc && node test-db-connection.js",
+        "test:db:mongodb": "npm run build:tsc && node test-db-connection.js mongodb",
+        "test:db:postgresql": "npm run build:tsc && node test-db-connection.js postgresql",
+        "test:db:sqlite": "npm run build:tsc && node test-db-connection.js sqlite",
+        "test:db:memory": "npm run build:tsc && node test-db-connection.js memory"
     },
     "license": "MIT",
     "dependencies": {
@@ -31,7 +36,11 @@
         "jsonwebtoken": "^9.0.2",
         "mongodb": "^6.0.0",
         "mongodb-memory-server": "^10.1.4",
-        "mongoose": "^7.5.1"
+        "mongoose": "^7.5.1",
+        "pg": "^8.11.3",
+        "sqlite3": "^5.1.6",
+        "knex": "^3.0.1",
+        "uuid": "^9.0.1"
     },
     "devDependencies": {
         "@eslint/js": "^9.29.0",
@@ -44,6 +53,8 @@
         "@types/express": "^5.0.3",
         "@types/jsonwebtoken": "^9.0.10",
         "@types/node": "^24.0.3",
+        "@types/pg": "^8.10.7",
+        "@types/uuid": "^9.0.7",
         "concurrently": "^8.2.1",
         "eslint": "^9.29.0",
         "nodemon": "^3.0.1",
