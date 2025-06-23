@@ -9,7 +9,7 @@ import {
     useUpdateUserMutation,
 } from "../slices/usersApiSlice";
 import Message from "../components/Message";
-import { SerializedError } from "@reduxjs/toolkit";
+import { type SerializedError } from "@reduxjs/toolkit";
 
 const UserEditScreen = () => {
     // State for form fields

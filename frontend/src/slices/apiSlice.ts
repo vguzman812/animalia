@@ -12,6 +12,5 @@ export const apiSlice = createApi({
     tagTypes: ["Fact", "User"],
     // Define the API endpoints within the slice
     // Currently empty but is extended with API calls through other slices
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    endpoints: (builder) => ({}),
+    endpoints: () => ({}),
 });

@@ -2,9 +2,9 @@ import { Table, Button } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import FactType from "../types/factType";
+import type FactType from "../types/factType";
 
-type FactTableProps = {
+interface FactTableProps {
     facts: FactType[];
     deleteHandler: (id: string) => void; // Function prop for handling deletes
 };

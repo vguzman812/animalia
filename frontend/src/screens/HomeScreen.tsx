@@ -5,14 +5,16 @@ import { useGetAllFactsQuery } from "../slices/factsApiSlice";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import Paginate from "../components/Paginate";
-import FactType from "../types/factType";
+import type FactType from "../types/factType";
 import { Link } from "react-router-dom";
 import FactsCarousel from "../components/FactsCarousel";
 import Meta from "../components/Meta";
 
 const HomeScreen = () => {
     // Extracting query parameters
-    const { pageNumber, keyword } = useParams();
+    const params = useParams();
+    const pageNumber = params.pageNumber ? Number(params.pageNumber) : 1
+    const keyword = params.keyword ?? ""
 
     // Fetching facts using a custom query hook
     const { data, isLoading, error } = useGetAllFactsQuery({
@@ -29,13 +31,13 @@ const HomeScreen = () => {
         if ("data" in error) {
             return (
                 <Message variant="danger">
-                    {(error.data as any)?.message}
+                    {(error.data as Error)?.message}
                 </Message>
             );
         } else {
             return (
                 <Message variant="danger">
-                    {(error as any).message || "Unknown error"}
+                    {(error as Error).message || "Unknown error"}
                 </Message>
             );
         }

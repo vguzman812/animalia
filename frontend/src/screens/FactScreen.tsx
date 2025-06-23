@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Row, Col, Image, ListGroup, Button } from "react-bootstrap";
 import { useSelector } from "react-redux";
-import FactType from "../types/factType";
+import type FactType from "../types/factType";
 import {
     useGetOneFactQuery,
     useLikeFactMutation,

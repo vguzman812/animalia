@@ -13,7 +13,8 @@ import Paginate from "../components/Paginate";
 
 const FactListScreen = () => {
     // Extract the page number from URL parameters
-    const { pageNumber } = useParams();
+    const params = useParams()
+    const pageNumber = params.pageNumber ? Number(params.pageNumber) : 1
 
     // Fetch all facts from the server
     const { data, isLoading, refetch, error } = useGetAllFactsQuery({

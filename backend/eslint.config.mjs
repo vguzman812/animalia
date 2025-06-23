@@ -5,7 +5,8 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
     eslint.configs.recommended,
     tseslint.configs.recommendedTypeChecked,
-    { ignores: ["dist", "**/*.js"] },
+    tseslint.configs.stylisticTypeChecked,
+    { ignores: ["dist", "**/*.js", "eslint.config.mjs"] },
     {
         files: ["**/*.{ts,tsx}"],
         languageOptions: {

@@ -1,21 +1,31 @@
 import { FACTS_URL } from "../constants";
 import { apiSlice } from "./apiSlice";
-import FactType from "../types/factType";
-import CreateFactType from "../types/createFactType";
-import AllFactsType from "../types/allFactsType";
+import type FactType from "../types/factType";
+import type CreateFactType from "../types/createFactType";
+import type { AllFactsType } from "../types/allFactsType";
+
+interface GetAllFactsParams {
+    keyword?: string;
+    pageNumber: number;
+}
+
+interface GetAllFactsByUserIdParams {
+    id: string;
+    pageNumber: number;
+}
 
 // Extend the base apiSlice with additional endpoints related to facts
 export const factsApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         // Query to get all facts based on keyword and pageNumber
-        getAllFacts: builder.query<AllFactsType, any>({
+        getAllFacts: builder.query<AllFactsType, GetAllFactsParams>({
             query: ({ keyword, pageNumber }) => ({
                 url: FACTS_URL,
                 params: { keyword, pageNumber },
             }),
             providesTags: (result?: AllFactsType) => [
                 "Fact",
-                ...(result?.facts?.map((fact) => ({ type: "Fact" as const })) ??
+                ...(result?.facts?.map(() => ({ type: "Fact" as const })) ??
                     []),
             ],
 
@@ -32,7 +42,10 @@ export const factsApiSlice = apiSlice.injectEndpoints({
             keepUnusedDataFor: 5,
         }),
         // Query to get all facts made by one user based on user id
-        getAllFactsByUserId: builder.query<AllFactsType, any>({
+        getAllFactsByUserId: builder.query<
+            AllFactsType,
+            GetAllFactsByUserIdParams
+        >({
             query: ({ id, pageNumber }) => ({
                 url: `${FACTS_URL}/user/${id}`,
                 params: { id, pageNumber },

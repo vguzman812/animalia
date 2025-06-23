@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import Card from "react-bootstrap/Card";
 import { Link } from "react-router-dom";
-import FactType from "../types/factType";
+import type FactType from "../types/factType";
 import fallbackImageUrl from "../assets/images/generic-animal-placeholder.webp";
 
 const FactCard = ({ fact }: { fact: FactType }) => {
     const fallbackImage = fallbackImageUrl;
-    const [imgSrc, setImgSrc] = useState<string>(fact.media || fallbackImage);
+    const [imgSrc, setImgSrc] = useState<string>(fact.media ?? fallbackImage);
 
     useEffect(() => {
         if (fact.media) {
@@ -17,7 +17,6 @@ const FactCard = ({ fact }: { fact: FactType }) => {
         } else {
             setImgSrc(fallbackImage);
         }
-        /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [fact.media]);
 
     return (

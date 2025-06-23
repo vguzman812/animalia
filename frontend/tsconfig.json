@@ -1,6 +1,6 @@
 {
     "extends": [
-        "@tsconfig/strictest/tsconfig",
+        "@tsconfig/recommended/tsconfig",
         "@tsconfig/vite-react/tsconfig.json"
     ],
     "exclude": ["eslint.config.mjs", "node_modules", "dist"]

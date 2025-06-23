@@ -1,4 +1,4 @@
-interface FactType {
+export default interface FactType {
     _id?: string;
     user?: string;
     animal: string;
@@ -9,4 +9,3 @@ interface FactType {
     likes?: string[];
 }
 
-export default FactType;

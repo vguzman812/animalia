@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 
 const FormContainer = ({ children }: { children: ReactNode }) => {

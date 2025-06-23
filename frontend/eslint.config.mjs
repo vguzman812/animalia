@@ -1,14 +1,16 @@
+import globals from "globals";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import reactPlugin from "eslint-plugin-react";
-import globals from "globals";
+
 export default tseslint.config(
     eslint.configs.recommended,
     tseslint.configs.recommendedTypeChecked,
+    tseslint.configs.stylisticTypeChecked,
     reactPlugin.configs.flat.recommended,
     reactPlugin.configs.flat["jsx-runtime"],
 
-    { ignores: ["dist", "**/*.js"] },
+    { ignores: ["dist", "**/*.js", "eslint.config.mjs"] },
     {
         plugins: {
             react: reactPlugin,
@@ -23,6 +25,11 @@ export default tseslint.config(
                 ecmaFeatures: {
                     jsx: true,
                 },
+            },
+        },
+        settings: {
+            react: {
+                version: "detect",
             },
         },
     }

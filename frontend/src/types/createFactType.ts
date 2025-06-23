@@ -1,4 +1,4 @@
-interface CreateFactType {
+export default interface CreateFactType {
     animal: string;
     source: string;
     text: string;
@@ -6,4 +6,3 @@ interface CreateFactType {
     wiki?: string;
 }
 
-export default CreateFactType;
