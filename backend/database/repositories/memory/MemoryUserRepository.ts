@@ -1,6 +1,11 @@
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
-import type { IUser, IUserRepository, PaginationOptions, IPaginatedResult } from "../../../types/index.ts";
+import type {
+    IUser,
+    IUserRepository,
+    PaginationOptions,
+    IPaginatedResult,
+} from "../../../types/index.ts";
 
 export class MemoryUserRepository implements IUserRepository {
     private users: Map<string, IUser> = new Map();
@@ -18,7 +23,9 @@ export class MemoryUserRepository implements IUserRepository {
         return Promise.resolve(null);
     }
 
-    async create(userData: Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>): Promise<IUser> {
+    async create(
+        userData: Omit<IUser, "id" | "createdAt" | "updatedAt">
+    ): Promise<IUser> {
         // Hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(userData.password, salt);
@@ -36,7 +43,10 @@ export class MemoryUserRepository implements IUserRepository {
         return Promise.resolve(user);
     }
 
-    async update(id: string, userData: Partial<Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>>): Promise<IUser | null> {
+    async update(
+        id: string,
+        userData: Partial<Omit<IUser, "id" | "createdAt" | "updatedAt">>
+    ): Promise<IUser | null> {
         const user = this.users.get(id);
         if (!user) return null;
 
@@ -61,7 +71,9 @@ export class MemoryUserRepository implements IUserRepository {
         return Promise.resolve(this.users.delete(id));
     }
 
-    async findAll(options: PaginationOptions = {}): Promise<IPaginatedResult<IUser>> {
+    async findAll(
+        options: PaginationOptions = {}
+    ): Promise<IPaginatedResult<IUser>> {
         const page = options.page || 1;
         const limit = options.limit || 10;
         const offset = (page - 1) * limit;

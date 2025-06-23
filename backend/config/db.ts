@@ -19,8 +19,10 @@ export class DatabaseManager {
     }
 
     private getConfig(): DatabaseConfig {
-        const {DATABASE_TYPE} = process.env
-        const databaseType: DatabaseType = DATABASE_TYPE ? DATABASE_TYPE as DatabaseType : "memory"
+        const { DATABASE_TYPE } = process.env;
+        const databaseType: DatabaseType = DATABASE_TYPE
+            ? (DATABASE_TYPE as DatabaseType)
+            : "memory";
 
         const config: DatabaseConfig = { type: databaseType };
 
@@ -42,7 +44,7 @@ export class DatabaseManager {
                     password: process.env.POSTGRES_PASSWORD || "",
                 };
                 break;
-                
+
             case "memory":
                 // No additional config needed for memory adapter
                 break;

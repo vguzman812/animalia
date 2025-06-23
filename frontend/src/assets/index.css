@@ -2,20 +2,20 @@
     height: 50vh;
 }
 .carousel-div {
-    display:flex;
+    display: flex;
 }
 .carousel-image {
     min-width: 50%;
     object-position: center;
     object-fit: cover;
-    float:left;
+    float: left;
 }
 
-.fact-image{
+.fact-image {
     min-height: 150px;
     max-height: 150px;
     object-fit: cover;
-    object-position: center;;
+    object-position: center;
 }
 .carousel-text {
     color: white;

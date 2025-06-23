@@ -1,15 +1,22 @@
 import { v4 as uuidv4 } from "uuid";
-import type { IFact, IFactRepository, PaginationOptions, IPaginatedResult } from "../../../types/index.ts";
+import type {
+    IFact,
+    IFactRepository,
+    PaginationOptions,
+    IPaginatedResult,
+} from "../../../types/index.ts";
 
 export class MemoryFactRepository implements IFactRepository {
     private facts: Map<string, IFact> = new Map();
 
     async findById(id: string): Promise<IFact | null> {
-        const fact =  this.facts.get(id) || null;
-        return Promise.resolve(fact)
+        const fact = this.facts.get(id) || null;
+        return Promise.resolve(fact);
     }
 
-    async findAll(options: PaginationOptions & { keyword?: string } = {}): Promise<IPaginatedResult<IFact>> {
+    async findAll(
+        options: PaginationOptions & { keyword?: string } = {}
+    ): Promise<IPaginatedResult<IFact>> {
         const page = options.page || 1;
         const limit = options.limit || 10;
         const offset = (page - 1) * limit;
@@ -18,8 +25,10 @@ export class MemoryFactRepository implements IFactRepository {
 
         // Apply keyword filter if provided
         if (options.keyword) {
-            allFacts = allFacts.filter(fact =>
-                fact.animal.toLowerCase().includes(options.keyword!.toLowerCase())
+            allFacts = allFacts.filter((fact) =>
+                fact.animal
+                    .toLowerCase()
+                    .includes(options.keyword!.toLowerCase())
             );
         }
 
@@ -27,7 +36,6 @@ export class MemoryFactRepository implements IFactRepository {
         allFacts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
         const paginatedFacts = allFacts.slice(offset, offset + limit);
-
 
         return Promise.resolve({
             data: paginatedFacts,
@@ -37,12 +45,17 @@ export class MemoryFactRepository implements IFactRepository {
         });
     }
 
-    async findByUserId(userId: string, options: PaginationOptions = {}): Promise<IPaginatedResult<IFact>> {
+    async findByUserId(
+        userId: string,
+        options: PaginationOptions = {}
+    ): Promise<IPaginatedResult<IFact>> {
         const page = options.page || 1;
         const limit = options.limit || 10;
         const offset = (page - 1) * limit;
 
-        const userFacts = Array.from(this.facts.values()).filter(fact => fact.userId === userId);
+        const userFacts = Array.from(this.facts.values()).filter(
+            (fact) => fact.userId === userId
+        );
 
         // Sort by creation date (newest first)
         userFacts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
@@ -57,7 +70,9 @@ export class MemoryFactRepository implements IFactRepository {
         });
     }
 
-    async create(factData: Omit<IFact, 'id' | 'createdAt' | 'updatedAt'>): Promise<IFact> {
+    async create(
+        factData: Omit<IFact, "id" | "createdAt" | "updatedAt">
+    ): Promise<IFact> {
         const now = new Date();
         const fact: IFact = {
             id: uuidv4(),
@@ -71,7 +86,10 @@ export class MemoryFactRepository implements IFactRepository {
         return Promise.resolve(fact);
     }
 
-    async update(id: string, factData: Partial<Omit<IFact, 'id' | 'createdAt' | 'updatedAt'>>): Promise<IFact | null> {
+    async update(
+        id: string,
+        factData: Partial<Omit<IFact, "id" | "createdAt" | "updatedAt">>
+    ): Promise<IFact | null> {
         const fact = this.facts.get(id);
         if (!fact) return null;
 
@@ -104,7 +122,7 @@ export class MemoryFactRepository implements IFactRepository {
         }
 
         let allFacts = Array.from(this.facts.values());
-        allFacts = allFacts.filter(fact =>
+        allFacts = allFacts.filter((fact) =>
             fact.animal.toLowerCase().includes(keyword.toLowerCase())
         );
 

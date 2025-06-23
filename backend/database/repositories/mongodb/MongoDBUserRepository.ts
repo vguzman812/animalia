@@ -1,8 +1,12 @@
-import type { IUser, IUserRepository, PaginationOptions, IPaginatedResult } from "../../../types/index.ts";
+import type {
+    IUser,
+    IUserRepository,
+    PaginationOptions,
+    IPaginatedResult,
+} from "../../../types/index.ts";
 import { MongoUser, type IMongoUser } from "../../models/mongodb/userModel.ts";
 
 export class MongoDBUserRepository implements IUserRepository {
-
     private convertToUser(mongoUser: IMongoUser): IUser {
         return {
             id: mongoUser._id.toString(),
@@ -35,7 +39,9 @@ export class MongoDBUserRepository implements IUserRepository {
         }
     }
 
-    async create(userData: Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>): Promise<IUser> {
+    async create(
+        userData: Omit<IUser, "id" | "createdAt" | "updatedAt">
+    ): Promise<IUser> {
         try {
             const user = new MongoUser(userData);
             const savedUser = await user.save();
@@ -46,7 +52,10 @@ export class MongoDBUserRepository implements IUserRepository {
         }
     }
 
-    async update(id: string, userData: Partial<Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>>): Promise<IUser | null> {
+    async update(
+        id: string,
+        userData: Partial<Omit<IUser, "id" | "createdAt" | "updatedAt">>
+    ): Promise<IUser | null> {
         try {
             const user = await MongoUser.findById(id);
             if (!user) return null;
@@ -70,7 +79,9 @@ export class MongoDBUserRepository implements IUserRepository {
         }
     }
 
-    async findAll(options: PaginationOptions = {}): Promise<IPaginatedResult<IUser>> {
+    async findAll(
+        options: PaginationOptions = {}
+    ): Promise<IPaginatedResult<IUser>> {
         try {
             const page = options.page || 1;
             const limit = options.limit || 10;
@@ -78,11 +89,11 @@ export class MongoDBUserRepository implements IUserRepository {
 
             const [users, total] = await Promise.all([
                 MongoUser.find().skip(skip).limit(limit),
-                MongoUser.countDocuments()
+                MongoUser.countDocuments(),
             ]);
 
             return {
-                data: users.map(user => this.convertToUser(user)),
+                data: users.map((user) => this.convertToUser(user)),
                 page,
                 pages: Math.ceil(total / limit),
                 total,

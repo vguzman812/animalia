@@ -1,11 +1,12 @@
-import type { IFact, IFactRepository, PaginationOptions, IPaginatedResult } from "../../../types/index.ts";
-import {
-    MongoFact,
-    type IMongoFact,
-} from "../../models/mongodb/factModel.ts"
+import type {
+    IFact,
+    IFactRepository,
+    PaginationOptions,
+    IPaginatedResult,
+} from "../../../types/index.ts";
+import { MongoFact, type IMongoFact } from "../../models/mongodb/factModel.ts";
 
 export class MongoDBFactRepository implements IFactRepository {
-
     private convertToFact(mongoFact: IMongoFact): IFact {
         return {
             id: mongoFact._id.toString(),
@@ -15,7 +16,7 @@ export class MongoDBFactRepository implements IFactRepository {
             text: mongoFact.text,
             media: mongoFact.media,
             wiki: mongoFact.wiki,
-            likes: mongoFact.likes.map(like => like.toString()),
+            likes: mongoFact.likes.map((like) => like.toString()),
             createdAt: mongoFact.createdAt,
             updatedAt: mongoFact.updatedAt,
         };
@@ -31,7 +32,9 @@ export class MongoDBFactRepository implements IFactRepository {
         }
     }
 
-    async findAll(options: PaginationOptions & { keyword?: string } = {}): Promise<IPaginatedResult<IFact>> {
+    async findAll(
+        options: PaginationOptions & { keyword?: string } = {}
+    ): Promise<IPaginatedResult<IFact>> {
         try {
             const page = options.page || 1;
             const limit = options.limit || 10;
@@ -52,11 +55,11 @@ export class MongoDBFactRepository implements IFactRepository {
                     .skip(skip)
                     .limit(limit)
                     .sort({ createdAt: -1 }),
-                MongoFact.countDocuments(query)
+                MongoFact.countDocuments(query),
             ]);
 
             return {
-                data: facts.map(fact => this.convertToFact(fact)),
+                data: facts.map((fact) => this.convertToFact(fact)),
                 page,
                 pages: Math.ceil(total / limit),
                 total,
@@ -67,7 +70,10 @@ export class MongoDBFactRepository implements IFactRepository {
         }
     }
 
-    async findByUserId(userId: string, options: PaginationOptions = {}): Promise<IPaginatedResult<IFact>> {
+    async findByUserId(
+        userId: string,
+        options: PaginationOptions = {}
+    ): Promise<IPaginatedResult<IFact>> {
         try {
             const page = options.page || 1;
             const limit = options.limit || 10;
@@ -78,11 +84,11 @@ export class MongoDBFactRepository implements IFactRepository {
                     .skip(skip)
                     .limit(limit)
                     .sort({ createdAt: -1 }),
-                MongoFact.countDocuments({ user: userId })
+                MongoFact.countDocuments({ user: userId }),
             ]);
 
             return {
-                data: facts.map(fact => this.convertToFact(fact)),
+                data: facts.map((fact) => this.convertToFact(fact)),
                 page,
                 pages: Math.ceil(total / limit),
                 total,
@@ -93,7 +99,9 @@ export class MongoDBFactRepository implements IFactRepository {
         }
     }
 
-    async create(factData: Omit<IFact, 'id' | 'createdAt' | 'updatedAt'>): Promise<IFact> {
+    async create(
+        factData: Omit<IFact, "id" | "createdAt" | "updatedAt">
+    ): Promise<IFact> {
         try {
             const mongoFactData = {
                 user: factData.userId,
@@ -114,7 +122,10 @@ export class MongoDBFactRepository implements IFactRepository {
         }
     }
 
-    async update(id: string, factData: Partial<Omit<IFact, 'id' | 'createdAt' | 'updatedAt'>>): Promise<IFact | null> {
+    async update(
+        id: string,
+        factData: Partial<Omit<IFact, "id" | "createdAt" | "updatedAt">>
+    ): Promise<IFact | null> {
         try {
             const fact = await MongoFact.findById(id);
             if (!fact) return null;
@@ -154,7 +165,7 @@ export class MongoDBFactRepository implements IFactRepository {
                 .sort({ likes: -1 })
                 .limit(limit);
 
-            return facts.map(fact => this.convertToFact(fact));
+            return facts.map((fact) => this.convertToFact(fact));
         } catch (error) {
             console.error("Error getting top liked facts:", error);
             throw error;

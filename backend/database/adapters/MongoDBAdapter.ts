@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import type { IDatabaseAdapter, IUserRepository, IFactRepository } from "../../types/index.ts";
+import type {
+    IDatabaseAdapter,
+    IUserRepository,
+    IFactRepository,
+} from "../../types/index.ts";
 import { MongoDBUserRepository } from "../repositories/mongodb/MongoDBUserRepository.js";
 import { MongoDBFactRepository } from "../repositories/mongodb/MongoDBFactRepository.js";
 

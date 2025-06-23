@@ -121,7 +121,7 @@ export interface IPaginatedResult<T> {
 }
 
 // Database configuration
-export type DatabaseType = "mongodb" | "postgresql" | "sqlite" | "memory" ;
+export type DatabaseType = "mongodb" | "postgresql" | "sqlite" | "memory";
 
 export interface DatabaseConfig {
     type: DatabaseType;

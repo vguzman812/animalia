@@ -24,17 +24,14 @@ app.use(cookieParser());
 app.use("/api/facts", factRoutes);
 app.use("/api/users", userRoutes);
 
-// Get directory name for the current module
-const __dirname = path.resolve();
-
 // Check if app is running in production environment
 if (process.env["NODE_ENV"] === "production") {
     // Set the static folder for serving frontend files
-    app.use(Express.static(path.join(__dirname, "/frontend/dist")));
+    app.use(Express.static("dist"));
 
     // Any undefined route will serve index.html file
     app.get("*", (_req, res) =>
-        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
+        res.sendFile(path.resolve("dist", "index.html"))
     );
 } else {
     // Basic route for the root URL
