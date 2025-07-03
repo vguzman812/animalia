@@ -99,6 +99,9 @@ export interface IFactRepository {
     create(
         factData: Omit<IFact, "id" | "createdAt" | "updatedAt">
     ): Promise<IFact>;
+    createWithTimestamps(
+        factData: Omit<IFact, "id"> // Allows createdAt and updatedAt
+    ): Promise<IFact>;
     update(
         id: string,
         factData: Partial<Omit<IFact, "id" | "createdAt" | "updatedAt">>

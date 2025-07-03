@@ -1,0 +1,4 @@
+- Test MemoryAdapter with autoSeed enabled (should seed empty database)
+- Test MemoryAdapter with autoSeed disabled (should not seed)
+- Test that it doesn't re-seed when database already has data
+- Test error handling during auto-seeding

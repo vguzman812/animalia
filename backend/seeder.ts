@@ -4,8 +4,25 @@ import sampleUsers from "./data/users.js";
 import sampleFacts from "./data/facts.js";
 import DatabaseManager from "./config/db.js";
 
+const updateProgressBar = (
+    current: number,
+    total: number,
+    barLength = 40
+) => {
+    const progress = current / total;
+    const filledLength = Math.round(barLength * progress);
+    const bar = "█".repeat(filledLength) + "░".repeat(barLength - filledLength);
+    const percentage = Math.round(progress * 100);
+
+    process.stdout.write(`\r[${bar}] ${percentage}% (${current}/${total})`);
+
+    if (current === total) {
+        process.stdout.write("\n");
+    }
+};
+
 // Function to populate the database with sample data
-const importData = async () => {
+const importData = async (maxFacts?: number) => {
     // function to allow for different creation times in the db of seeded data
     const sleep = (milliseconds: number) => {
         return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -58,19 +75,27 @@ const importData = async () => {
         }
 
         console.log(`Created ${createdUsers.length} users`);
-        console.log("Seeding facts. Please be patient...");
+
+        // Determine how many facts to create
+        const factsToCreate = maxFacts
+            ? Math.min(maxFacts, sampleFacts.length)
+            : sampleFacts.length;
+        const selectedFacts = sampleFacts.slice(0, factsToCreate);
+        console.log(`Seeding ${factsToCreate} facts. Please be patient...`);
 
         // Create facts and assign them to the first user (admin)
-        let count = 1;
-        for (const factData of sampleFacts) {
-            console.log(`Adding fact ${count} of ${sampleFacts.length}`);
+        for (let i = 0; i < selectedFacts.length; i++) {
+            const factData = selectedFacts[i];
             await factRepository.create({
                 ...factData,
                 userId: firstUser.id,
                 likes: [],
             });
+
+            // Update progress bar
+            updateProgressBar(i + 1, selectedFacts.length);
+
             await sleep(500); // wait for .5 second in between facts population
-            count++;
         }
 
         // Log a success message
@@ -141,13 +166,47 @@ const destroyData = async () => {
     }
 };
 
+const parseArgs = () => {
+    const args = process.argv.slice(2);
+    let maxFacts: number | undefined;
+    let shouldDestroy = false;
+
+    for (let i = 0; i < args.length; i++) {
+        const arg = args[i];
+
+        if (arg === "-D" || arg === "-d") {
+            shouldDestroy = true;
+        } else if (arg === "--limit" || arg === "-l") {
+            const nextArg = args[i + 1];
+            if (nextArg && !isNaN(Number(nextArg))) {
+                maxFacts = Number(nextArg);
+                i++; // Skip the next argument since we've used it
+            } else {
+                console.error("Error: --limit requires a number".red);
+                process.exit(1);
+            }
+        } else if (arg.startsWith("--limit=")) {
+            const value = arg.split("=")[1];
+            if (value && !isNaN(Number(value))) {
+                maxFacts = Number(value);
+            } else {
+                console.error("Error: --limit requires a number".red);
+                process.exit(1);
+            }
+        }
+    }
+
+    return { shouldDestroy, maxFacts };
+};
+
 void (async (): Promise<void> => {
     try {
-        // Check command-line arguments to determine which function to run
-        if (process.argv.includes("-D") || process.argv.includes("-d")) {
+        const { shouldDestroy, maxFacts } = parseArgs();
+
+        if (shouldDestroy) {
             await destroyData();
         } else {
-            await importData();
+            await importData(maxFacts);
         }
     } catch (err: unknown) {
         // turn whatever we got into a string
