@@ -4,11 +4,12 @@ import cookieParser from "cookie-parser";
 import DatabaseManager from "./config/db.js";
 import factRoutes from "./routes/factRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import systemRoutes from "./routes/systemRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
 import path from "path";
 
 // Initialize port from environment variables or use 8888 as default
-const port = process.env["PORT"] || 8888;
+const port = process.env.PORT ?? 8888;
 
 // Initialize Express application
 const app = Express();
@@ -20,12 +21,13 @@ app.use(Express.urlencoded({ extended: true }));
 // Middleware for parsing cookies
 app.use(cookieParser());
 
-// Define API routes for facts and users
+// Define API routes
 app.use("/api/facts", factRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/system", systemRoutes); // health/info
 
 // Check if app is running in production environment
-if (process.env["NODE_ENV"] === "production") {
+if (process.env.NODE_ENV === "production") {
     // Set the static folder for serving frontend files
     app.use(Express.static("dist"));
 

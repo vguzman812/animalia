@@ -9,8 +9,6 @@ export class DatabaseManager {
     private static instance: DatabaseManager;
     private adapter: IDatabaseAdapter | null = null;
 
-    private constructor() {}
-
     static getInstance(): DatabaseManager {
         if (!DatabaseManager.instance) {
             DatabaseManager.instance = new DatabaseManager();
@@ -37,11 +35,11 @@ export class DatabaseManager {
 
             case "postgresql":
                 config.postgresql = {
-                    host: process.env.POSTGRES_HOST || "localhost",
-                    port: parseInt(process.env.POSTGRES_PORT || "5432"),
-                    database: process.env.POSTGRES_DB || "animalia",
-                    username: process.env.POSTGRES_USER || "",
-                    password: process.env.POSTGRES_PASSWORD || "",
+                    host: process.env.POSTGRES_HOST ?? "localhost",
+                    port: parseInt(process.env.POSTGRES_PORT ?? "5432"),
+                    database: process.env.POSTGRES_DB ?? "animalia",
+                    username: process.env.POSTGRES_USER ?? "",
+                    password: process.env.POSTGRES_PASSWORD ?? "",
                 };
                 break;
 
