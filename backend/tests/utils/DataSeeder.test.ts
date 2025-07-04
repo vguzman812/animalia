@@ -1,4 +1,0 @@
-- Test the DataSeeder class with mock repositories
-- Test successful seeding of users and facts
-- Test error handling when seeding fails
-- Test that the correct data is passed to repositories

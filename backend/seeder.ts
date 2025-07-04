@@ -4,7 +4,7 @@ import sampleUsers from "./data/users.js";
 import sampleFacts from "./data/facts.js";
 import DatabaseManager from "./config/db.js";
 
-const updateProgressBar = (
+export const updateProgressBar = (
     current: number,
     total: number,
     barLength = 40
@@ -22,7 +22,7 @@ const updateProgressBar = (
 };
 
 // Function to populate the database with sample data
-const importData = async (maxFacts?: number) => {
+export const importData = async (maxFacts?: number) => {
     // function to allow for different creation times in the db of seeded data
     const sleep = (milliseconds: number) => {
         return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -116,7 +116,7 @@ const importData = async (maxFacts?: number) => {
 };
 
 // Function to delete all data from the database
-const destroyData = async () => {
+export const destroyData = async () => {
     try {
         const dbManager = DatabaseManager.getInstance();
         await dbManager.connect();
@@ -166,7 +166,7 @@ const destroyData = async () => {
     }
 };
 
-const parseArgs = () => {
+export const parseArgs = () => {
     const args = process.argv.slice(2);
     let maxFacts: number | undefined;
     let shouldDestroy = false;
