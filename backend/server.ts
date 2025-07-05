@@ -6,6 +6,7 @@ import factRoutes from "./routes/factRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import systemRoutes from "./routes/systemRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
+import { importData } from "./seeder.js";
 import path from "path";
 
 // Initialize port from environment variables or use 8888 as default
@@ -52,8 +53,26 @@ app.use(errorHandler);
 // Connect, then start
 DatabaseManager.getInstance()
     .connect()
-    .then(() => {
-        console.log("Database connected, starting server…");
+    .then(async () => {
+        console.log("Database connected");
+        const databaseType = process.env.DATABASE_TYPE ?? "memory";
+
+        if (databaseType === "memory") {
+            try {
+                console.log("Seeding memory database…");
+                const result = await importData(undefined, true); // silent mode, all facts
+                console.log(
+                    `✅ Memory database seeded with ${
+                        result.users || 0
+                    } users and ${result.facts || 0} facts`
+                );
+            } catch (error) {
+                console.error("❌ Failed to seed memory database:", error);
+                // Don't propagate error - continue with empty database
+            }
+        }
+
+        console.log("Starting server…");
         app.listen(port, () => console.log(`Server running on ${port}`));
     })
     .catch((err) => {

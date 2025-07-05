@@ -7,16 +7,16 @@ import {
     afterEach,
     type MockedFunction,
 } from "vitest";
-import DatabaseManager from "../../config/db.ts";
+import DatabaseManager from "../config/db.ts";
 import type {
     IUserRepository,
     IFactRepository,
     IUser,
     IFact,
-} from "../../types/index.ts";
-import { importData, destroyData, parseArgs } from "../../seeder.ts";
-import sampleFacts from "../../data/facts.ts";
-import sampleUsers from "../../data/users.ts";
+} from "../types/index.ts";
+import { importData, destroyData, parseArgs } from "../seeder.ts";
+import sampleFacts from "../data/facts.ts";
+import sampleUsers from "../data/users.ts";
 
 const sampleMockFacts = [
     {
@@ -57,7 +57,7 @@ export const sampleMockUsers = [
     },
 ];
 
-vi.mock("../../data/users.ts", () => ({
+vi.mock("../data/users.ts", () => ({
     default: [
         {
             name: "Admin User",
@@ -73,7 +73,7 @@ vi.mock("../../data/users.ts", () => ({
         },
     ],
 }));
-vi.mock("../../data/facts.ts", () => ({
+vi.mock("../data/facts.ts", () => ({
     default: [
         {
             animal: "Cat",
@@ -98,7 +98,7 @@ vi.mock("../../data/facts.ts", () => ({
         },
     ],
 }));
-vi.mock("../../config/db.js");
+vi.mock("../config/db.js");
 
 describe("Database Seeder", () => {
     let mockDbManager: {
@@ -180,7 +180,7 @@ describe("Database Seeder", () => {
                             } as IFact)
                     );
 
-                    await importData();
+                    await importData(undefined, true);
 
                     expect(mockUserRepo.count).toHaveBeenCalledOnce();
                     expect(mockFactRepo.count).toHaveBeenCalledOnce();
@@ -261,7 +261,7 @@ describe("Database Seeder", () => {
                             } as IFact)
                     );
 
-                    await importData();
+                    await importData(undefined, true);
 
                     expect(mockFactRepo.delete).toHaveBeenCalledTimes(
                         existingFacts.length
@@ -324,7 +324,7 @@ describe("Database Seeder", () => {
                             } as IFact)
                     );
 
-                    await importData();
+                    await importData(undefined, true);
 
                     expect(mockUserRepo.delete).toHaveBeenCalledTimes(
                         existingUsers.length
@@ -386,7 +386,7 @@ describe("Database Seeder", () => {
                             } as IFact)
                     );
 
-                    await importData();
+                    await importData(undefined, true);
 
                     expect(mockFactRepo.delete).toHaveBeenCalledTimes(
                         existingFacts.length
@@ -433,7 +433,7 @@ describe("Database Seeder", () => {
                     );
 
                     // allow delays to occur if that is the current implementation in seeder
-                    const importPromise = importData();
+                    const importPromise = importData(undefined, true);
                     await importPromise;
 
                     // Verify that each fact has a different timestamp
@@ -479,7 +479,7 @@ describe("Database Seeder", () => {
                             } as IFact)
                     );
 
-                    await importData();
+                    await importData(undefined, true);
 
                     const factCreationCalls = vi.mocked(mockFactRepo.create)
                         .mock.calls;
@@ -522,7 +522,7 @@ describe("Database Seeder", () => {
                             } as IFact)
                     );
 
-                    await importData(maxFacts);
+                    await importData(maxFacts, true);
 
                     expect(mockFactRepo.create).toHaveBeenCalledTimes(maxFacts);
                 });
@@ -587,7 +587,7 @@ describe("Database Seeder", () => {
                             } as IFact)
                     );
 
-                    await importData(maxFacts);
+                    await importData(maxFacts, true);
 
                     expect(mockFactRepo.create).toHaveBeenCalledTimes(
                         sampleMockFacts.length
@@ -668,7 +668,7 @@ describe("Database Seeder", () => {
                         existingFacts[0]
                     );
 
-                    await importData();
+                    await importData(undefined, true);
 
                     expect(mockFactRepo.delete).toHaveBeenCalledTimes(
                         existingFacts.length
@@ -720,7 +720,7 @@ describe("Database Seeder", () => {
                         {} as IFact
                     );
 
-                    await importData();
+                    await importData(undefined, true);
 
                     expect(mockUserRepo.delete).toHaveBeenCalledTimes(
                         existingUsers.length
@@ -764,7 +764,7 @@ describe("Database Seeder", () => {
                         {} as IFact
                     );
 
-                    await importData();
+                    await importData(undefined, true);
 
                     expect(mockFactRepo.delete).toHaveBeenCalledTimes(
                         existingFacts.length
@@ -786,7 +786,7 @@ describe("Database Seeder", () => {
                         {} as IFact
                     );
 
-                    await importData();
+                    await importData(undefined, true);
 
                     expect(mockFactRepo.delete).not.toHaveBeenCalled();
                     expect(mockUserRepo.delete).not.toHaveBeenCalled();
@@ -804,7 +804,7 @@ describe("Database Seeder", () => {
                         undefined as any
                     );
 
-                    await expect(importData()).rejects.toThrow(
+                    await expect(importData(undefined, true)).rejects.toThrow(
                         "No users were created"
                     );
                 });
@@ -818,7 +818,7 @@ describe("Database Seeder", () => {
                         createError
                     );
 
-                    await expect(importData()).rejects.toThrow(
+                    await expect(importData(undefined, true)).rejects.toThrow(
                         "User creation failed"
                     );
                 });
@@ -841,7 +841,7 @@ describe("Database Seeder", () => {
                     vi.mocked(mockUserRepo.create).mockResolvedValue(mockUser);
                     vi.mocked(mockFactRepo.create).mockRejectedValue(factError);
 
-                    await expect(importData()).rejects.toThrow(
+                    await expect(importData(undefined, true)).rejects.toThrow(
                         "Fact creation failed"
                     );
                 });

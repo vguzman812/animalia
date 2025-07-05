@@ -22,7 +22,7 @@ export const updateProgressBar = (
 };
 
 // Function to populate the database with sample data
-export const importData = async (maxFacts?: number) => {
+export const importData = async (maxFacts?: number, silent = false) => {
     // function to allow for different creation times in the db of seeded data
     const sleep = (milliseconds: number) => {
         return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -30,12 +30,11 @@ export const importData = async (maxFacts?: number) => {
 
     try {
         const dbManager = DatabaseManager.getInstance();
-        await dbManager.connect();
 
         const userRepository = dbManager.getUserRepository();
         const factRepository = dbManager.getFactRepository();
 
-        console.log("Clearing existing data...");
+        if (!silent) console.log("Clearing existing data...");
 
         // Facts first
         const totalFacts = await factRepository.count();
@@ -60,9 +59,9 @@ export const importData = async (maxFacts?: number) => {
                 await userRepository.delete(user.id);
             }
         }
-        console.log("Existing data cleared.");
+        if (!silent) console.log("Existing data cleared.");
 
-        console.log("Creating sample users...");
+        if (!silent) console.log("Creating sample users...");
         const createdUsers = [];
         for (const userData of sampleUsers) {
             const user = await userRepository.create(userData);
@@ -74,14 +73,15 @@ export const importData = async (maxFacts?: number) => {
             throw new Error("No users were created");
         }
 
-        console.log(`Created ${createdUsers.length} users`);
+        if (!silent) console.log(`Created ${createdUsers.length} users`);
 
         // Determine how many facts to create
         const factsToCreate = maxFacts
             ? Math.min(maxFacts, sampleFacts.length)
             : sampleFacts.length;
         const selectedFacts = sampleFacts.slice(0, factsToCreate);
-        console.log(`Seeding ${factsToCreate} facts. Please be patient...`);
+        if (!silent)
+            console.log(`Seeding ${factsToCreate} facts. Please be patient...`);
 
         // Create facts and assign them to the first user (admin)
         for (let i = 0; i < selectedFacts.length; i++) {
@@ -93,16 +93,15 @@ export const importData = async (maxFacts?: number) => {
             });
 
             // Update progress bar
-            updateProgressBar(i + 1, selectedFacts.length);
+            if (!silent) updateProgressBar(i + 1, selectedFacts.length);
 
             await sleep(500); // wait for .5 second in between facts population
         }
 
         // Log a success message
-        console.log("Data Imported!".green.inverse);
+        if (!silent) console.log("Data Imported!".green.inverse);
 
-        await dbManager.disconnect();
-        process.exit();
+        return { users: createdUsers.length, facts: factsToCreate };
     } catch (error) {
         // Log any errors
         if (error instanceof Error) {
@@ -111,7 +110,7 @@ export const importData = async (maxFacts?: number) => {
             console.error("something went wrong seeding the db: ");
             console.error(error);
         }
-        process.exit(1);
+        throw error;
     }
 };
 
@@ -119,7 +118,6 @@ export const importData = async (maxFacts?: number) => {
 export const destroyData = async () => {
     try {
         const dbManager = DatabaseManager.getInstance();
-        await dbManager.connect();
 
         const userRepository = dbManager.getUserRepository();
         const factRepository = dbManager.getFactRepository();
@@ -151,9 +149,6 @@ export const destroyData = async () => {
 
         // Log a success message
         console.log("Data Destroy operation completed!".red.inverse);
-
-        await dbManager.disconnect();
-        process.exit();
     } catch (error) {
         // Log any errors
         if (error instanceof Error) {
@@ -162,7 +157,7 @@ export const destroyData = async () => {
             console.error("something went wrong deleting db data: ");
             console.error(error);
         }
-        process.exit(1);
+        throw error;
     }
 };
 
@@ -199,19 +194,29 @@ export const parseArgs = () => {
     return { shouldDestroy, maxFacts };
 };
 
-void (async (): Promise<void> => {
-    try {
-        const { shouldDestroy, maxFacts } = parseArgs();
+// Only run the CLI logic if this file is being executed directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+    void (async (): Promise<void> => {
+        try {
+            const { shouldDestroy, maxFacts } = parseArgs();
+            const dbManager = DatabaseManager.getInstance();
+            await dbManager.connect();
 
-        if (shouldDestroy) {
-            await destroyData();
-        } else {
-            await importData(maxFacts);
+            if (shouldDestroy) {
+                await destroyData();
+                console.log("Data Destroy operation completed!".red.inverse);
+            } else {
+                await importData(maxFacts);
+                console.log("Data Imported!".green.inverse);
+            }
+
+            await dbManager.disconnect();
+            process.exit();
+        } catch (err: unknown) {
+            // turn whatever we got into a string
+            const msg = err instanceof Error ? err.message : String(err);
+            console.error(`Error in seeder: ${msg}`.red.inverse);
+            process.exit(1);
         }
-    } catch (err: unknown) {
-        // turn whatever we got into a string
-        const msg = err instanceof Error ? err.message : String(err);
-        console.error(`Error in seeder: ${msg}`.red.inverse);
-        process.exit(1);
-    }
-})();
+    })();
+}
