@@ -130,7 +130,6 @@ describe("Database Seeder", () => {
             create: vi.fn(),
             findById: vi.fn(),
             findByUserId: vi.fn(),
-            createWithTimestamps: vi.fn(),
             update: vi.fn(),
             getTopLiked: vi.fn(),
         };

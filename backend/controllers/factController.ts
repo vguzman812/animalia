@@ -8,9 +8,9 @@ import type { IAuthRequest, IFact } from "../types/index.js";
  * @access      Public
  */
 const getFacts = async (req: Request, res: Response) => {
-    const pageSize = Number(process.env["PAGINATION_LIMIT"]) || 10;
-    const page = Number(req.query["pageNumber"]) || 1;
-    const keyword = req.query["keyword"] as string;
+    const pageSize = Number(process.env.PAGINATION_LIMIT) || 10;
+    const page = Number(req.query.pageNumber) || 1;
+    const keyword = req.query.keyword as string;
 
     const factRepository = DatabaseManager.getInstance().getFactRepository();
     const result = await factRepository.findAll({
@@ -33,7 +33,7 @@ const getFacts = async (req: Request, res: Response) => {
  */
 const getFactById = async (req: Request, res: Response) => {
     const factRepository = DatabaseManager.getInstance().getFactRepository();
-    const fact = await factRepository.findById(req.params["id"] || "");
+    const fact = await factRepository.findById(req.params.id || "");
 
     if (fact) {
         res.status(200).json(fact);
@@ -64,7 +64,7 @@ const createFact = async (req: IAuthRequest, res: Response) => {
     const { animal, source, text, media, wiki } = req.body as IFact;
 
     // Assuming that req.user.id is available (i.e., user is authenticated)
-    if (req.user && req.user.id) {
+    if (req.user?.id) {
         const factRepository =
             DatabaseManager.getInstance().getFactRepository();
 
@@ -92,8 +92,8 @@ const createFact = async (req: IAuthRequest, res: Response) => {
  */
 const getFactsByUser = async (req: Request, res: Response) => {
     const { userId } = req.params;
-    const pageSize = Number(process.env["PAGINATION_LIMIT"]) || 10;
-    const page = Number(req.query["pageNumber"]) || 1;
+    const pageSize = Number(process.env.PAGINATION_LIMIT) || 10;
+    const page = Number(req.query.pageNumber) || 1;
 
     const factRepository = DatabaseManager.getInstance().getFactRepository();
     const result = await factRepository.findByUserId(userId, {
@@ -117,7 +117,7 @@ const updateFact = async (req: IAuthRequest, res: Response) => {
     const { animal, source, text, media, wiki } = req.body as IFact;
     const factRepository = DatabaseManager.getInstance().getFactRepository();
 
-    const fact = await factRepository.findById(req.params["id"] || "");
+    const fact = await factRepository.findById(req.params.id || "");
 
     if (fact) {
         // Authorization check: Make sure the user owns the fact they are trying to update
@@ -131,8 +131,8 @@ const updateFact = async (req: IAuthRequest, res: Response) => {
             animal: animal || fact.animal,
             source: source || fact.source,
             text: text || fact.text,
-            media: media !== undefined ? media : fact.media,
-            wiki: wiki !== undefined ? wiki : fact.wiki,
+            media: media ?? fact.media,
+            wiki: wiki ?? fact.wiki,
         });
 
         if (updatedFact) {
@@ -154,7 +154,7 @@ const updateFact = async (req: IAuthRequest, res: Response) => {
  */
 const deleteFact = async (req: IAuthRequest, res: Response) => {
     const factRepository = DatabaseManager.getInstance().getFactRepository();
-    const fact = await factRepository.findById(req.params["id"] || "");
+    const fact = await factRepository.findById(req.params.id || "");
 
     if (fact) {
         // Authorization check: Make sure the user owns the fact they are trying to delete
@@ -183,7 +183,7 @@ const deleteFact = async (req: IAuthRequest, res: Response) => {
  */
 const likeFact = async (req: IAuthRequest, res: Response) => {
     const factRepository = DatabaseManager.getInstance().getFactRepository();
-    const fact = await factRepository.findById(req.params["id"] || "");
+    const fact = await factRepository.findById(req.params.id || "");
 
     if (fact && req.user?.id) {
         // Check if the user has already liked this fact

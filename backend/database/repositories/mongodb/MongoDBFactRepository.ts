@@ -36,8 +36,8 @@ export class MongoDBFactRepository implements IFactRepository {
         options: PaginationOptions & { keyword?: string } = {}
     ): Promise<IPaginatedResult<IFact>> {
         try {
-            const page = options.page || 1;
-            const limit = options.limit || 10;
+            const page = options.page ?? 1;
+            const limit = options.limit ?? 10;
             const skip = (page - 1) * limit;
 
             let query = {};
@@ -75,8 +75,8 @@ export class MongoDBFactRepository implements IFactRepository {
         options: PaginationOptions = {}
     ): Promise<IPaginatedResult<IFact>> {
         try {
-            const page = options.page || 1;
-            const limit = options.limit || 10;
+            const page = options.page ?? 1;
+            const limit = options.limit ?? 10;
             const skip = (page - 1) * limit;
 
             const [facts, total] = await Promise.all([

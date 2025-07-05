@@ -7,18 +7,18 @@ import type {
 } from "../../../types/index.ts";
 
 export class MemoryFactRepository implements IFactRepository {
-    private facts: Map<string, IFact> = new Map();
+    private facts = new Map<string, IFact>();
 
     async findById(id: string): Promise<IFact | null> {
-        const fact = this.facts.get(id) || null;
+        const fact = this.facts.get(id) ?? null;
         return Promise.resolve(fact);
     }
 
     async findAll(
         options: PaginationOptions & { keyword?: string } = {}
     ): Promise<IPaginatedResult<IFact>> {
-        const page = options.page || 1;
-        const limit = options.limit || 10;
+        const page = options.page ?? 1;
+        const limit = options.limit ?? 10;
         const offset = (page - 1) * limit;
 
         let allFacts = Array.from(this.facts.values());
@@ -49,8 +49,8 @@ export class MemoryFactRepository implements IFactRepository {
         userId: string,
         options: PaginationOptions = {}
     ): Promise<IPaginatedResult<IFact>> {
-        const page = options.page || 1;
-        const limit = options.limit || 10;
+        const page = options.page ?? 1;
+        const limit = options.limit ?? 10;
         const offset = (page - 1) * limit;
 
         const userFacts = Array.from(this.facts.values()).filter(
