@@ -63,8 +63,8 @@ DatabaseManager.getInstance()
                 const result = await importData(undefined, true); // silent mode, all facts
                 console.log(
                     `✅ Memory database seeded with ${
-                        result.users || 0
-                    } users and ${result.facts || 0} facts`
+                        result?.users || 0
+                    } users and ${result?.facts || 0} facts`
                 );
             } catch (error) {
                 console.error("❌ Failed to seed memory database:", error);
