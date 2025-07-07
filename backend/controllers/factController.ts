@@ -255,5 +255,5 @@ export {
     deleteFact,
     likeFact,
     getTopFacts,
-    searchFacts
+    searchFacts,
 };

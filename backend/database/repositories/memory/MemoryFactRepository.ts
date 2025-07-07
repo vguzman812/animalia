@@ -131,10 +131,9 @@ export class MemoryFactRepository implements IFactRepository {
             data,
             page,
             pages,
-            total
+            total,
         });
     }
-
 
     async findByUserId(
         userId: string,

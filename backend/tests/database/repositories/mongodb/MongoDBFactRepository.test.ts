@@ -6,7 +6,7 @@ import {
     afterAll,
     beforeEach,
     afterEach,
-    vi
+    vi,
 } from "vitest";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
@@ -101,7 +101,7 @@ describe("MongoDBFactRepository Search & findAll", () => {
         }
     });
 
-    afterEach( () => {
+    afterEach(() => {
         vi.useRealTimers();
     });
 
@@ -308,7 +308,7 @@ describe("MongoDBFactRepository Search & findAll", () => {
 
         it("should sort results by creation date desc", async () => {
             const result = await repository.findAll({});
-            console.log('result :>> ', result);
+            console.log("result :>> ", result);
 
             expect(result.data).toHaveLength(4);
             expect(result.data[0].createdAt.getTime()).toBeGreaterThan(
@@ -382,6 +382,5 @@ describe("MongoDBFactRepository Search & findAll", () => {
                 page2.data[1].createdAt.getTime()
             );
         });
-
     });
 });

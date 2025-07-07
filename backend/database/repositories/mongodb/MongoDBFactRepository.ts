@@ -158,7 +158,6 @@ export class MongoDBFactRepository implements IFactRepository {
                 },
             };
 
-
             const [facts, total] = await Promise.all([
                 MongoFact.find(query).skip(skip).limit(limit).sort({
                     animal: 1, // Alphabetical first (A-Z)

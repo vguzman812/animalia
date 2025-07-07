@@ -1,6 +1,6 @@
 services:
-  app:                    # The name of the service, can be anything
-    image: animalia # Declares which image to use
-    build: .              # Declares where to build if image is not found
-    ports:                # Declares the ports to publish
-      - 3000:3000
+    app: # The name of the service, can be anything
+        image: animalia # Declares which image to use
+        build: . # Declares where to build if image is not found
+        ports: # Declares the ports to publish
+            - 3000:3000
