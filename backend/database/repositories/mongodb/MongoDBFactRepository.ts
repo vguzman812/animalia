@@ -98,21 +98,66 @@ export class MongoDBFactRepository implements IFactRepository {
             const limit = options.limit ?? 10;
             const skip = (page - 1) * limit;
 
-            // Create a regex pattern that removes all punctuation and special characters
-            // This allows flexible matching like "l.i.o.n" to match "African Lion"
-            const sanitized = animal.replace(/[^a-zA-Z0-9 ]/g, "");
-            if (!sanitized.trim()) {
-                // you could also throw here, but controller handles bad-request
-                return { data: [], page, pages: 0, total: 0 };
+            // Handle empty or whitespace-only search terms
+            const trimmedAnimal = animal.trim();
+            if (!trimmedAnimal) {
+                return {
+                    data: [],
+                    page,
+                    pages: 0,
+                    total: 0,
+                };
             }
-            const regex = new RegExp(sanitized, "i");
 
+            // Normalize search term: remove diacritcs and special characters
+            const normalizedSearch = trimmedAnimal
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+                .replace(/[^a-zA-Z0-9\s]/g, "") // Remove punctuation completely (only keep letters, numbers, and spaces)
+                .replace(/\s+/g, " ") // Normalize multiple spaces to single space
+                .trim();
+
+            if (!normalizedSearch) {
+                return {
+                    data: [],
+                    page,
+                    pages: 0,
+                    total: 0,
+                };
+            }
+
+            // Split into words and handle differently based on word count
+            const searchWords = normalizedSearch
+                .split(/\s+/)
+                .filter((word) => word.length > 0);
+
+            if (searchWords.length === 0) {
+                return {
+                    data: [],
+                    page,
+                    pages: 0,
+                    total: 0,
+                };
+            }
+
+            let regexPattern: string;
+            if (searchWords.length === 1) {
+                // Single word - should match as substring but respect word boundaries
+                const word = searchWords[0];
+                regexPattern = word;
+            } else {
+                // Multi-word search - words must appear in sequence with actual spaces between them
+                regexPattern = searchWords.join("\\s+");
+            }
+
+            // Create the MongoDB query
             const query = {
                 animal: {
-                    $regex: regex,
+                    $regex: regexPattern,
                     $options: "i",
                 },
             };
+
 
             const [facts, total] = await Promise.all([
                 MongoFact.find(query).skip(skip).limit(limit).sort({
