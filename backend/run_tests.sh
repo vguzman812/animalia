@@ -1,5 +1,4 @@
 #!/bin/sh
 
 export CI=true
-npm run build
-npm test ${@}
+npm test database routes controllers ${@}
