@@ -9,7 +9,12 @@ import type { IFact } from "../../types/index.js";
 // Mock middleware
 vi.mock("../../middleware/authMiddleware.js", () => ({
     protect: vi.fn((req, res, next: NextFunction) => {
-        req.user = { id: "user123", name: "Test User", email: "test@test.com", isAdmin: false };
+        req.user = {
+            id: "user123",
+            name: "Test User",
+            email: "test@test.com",
+            isAdmin: false,
+        };
         next();
     }),
 }));
@@ -88,9 +93,7 @@ describe("Fact Routes", () => {
                 pages: 1,
             });
 
-            const response = await request(app)
-                .get("/api/facts")
-                .expect(200);
+            const response = await request(app).get("/api/facts").expect(200);
 
             expect(response.body).toEqual({
                 facts: mockFacts,
@@ -114,9 +117,7 @@ describe("Fact Routes", () => {
                 pages: 1,
             });
 
-            await request(app)
-                .get("/api/facts?keyword=lion")
-                .expect(200);
+            await request(app).get("/api/facts?keyword=lion").expect(200);
 
             // The keyword should not be processed in the base route
             expect(mockGetFacts).toHaveBeenCalledWith(
@@ -198,17 +199,11 @@ describe("Fact Routes", () => {
                 });
             });
 
-            await request(app)
-                .get("/api/facts/search?animal=LION")
-                .expect(200);
+            await request(app).get("/api/facts/search?animal=LION").expect(200);
 
-            await request(app)
-                .get("/api/facts/search?animal=LiOn")
-                .expect(200);
+            await request(app).get("/api/facts/search?animal=LiOn").expect(200);
 
-            await request(app)
-                .get("/api/facts/search?animal=lion")
-                .expect(200);
+            await request(app).get("/api/facts/search?animal=lion").expect(200);
         });
 
         it("should handle partial substring matches", async () => {
@@ -220,13 +215,9 @@ describe("Fact Routes", () => {
                 });
             });
 
-            await request(app)
-                .get("/api/facts/search?animal=li")
-                .expect(200);
+            await request(app).get("/api/facts/search?animal=li").expect(200);
 
-            await request(app)
-                .get("/api/facts/search?animal=ion")
-                .expect(200);
+            await request(app).get("/api/facts/search?animal=ion").expect(200);
         });
 
         it("should handle special characters in search", async () => {
@@ -340,14 +331,19 @@ describe("Fact Routes", () => {
             expect(facts[2].animal).toBe("Mountain Lion");
 
             // Verify creation date sorting (desc) for same animal names
-            expect(new Date(facts[0].createdAt)).toEqual(new Date("2023-01-02"));
-            expect(new Date(facts[1].createdAt)).toEqual(new Date("2023-01-01"));
+            expect(new Date(facts[0].createdAt)).toEqual(
+                new Date("2023-01-02")
+            );
+            expect(new Date(facts[1].createdAt)).toEqual(
+                new Date("2023-01-01")
+            );
         });
 
         it("should return 400 when no search parameters provided", async () => {
             mockSearchFacts.mockImplementation((req, res) => {
                 res.status(400).json({
-                    message: "At least one search parameter (e.g., 'animal') is required",
+                    message:
+                        "At least one search parameter (e.g., 'animal') is required",
                 });
             });
 
@@ -355,23 +351,22 @@ describe("Fact Routes", () => {
                 .get("/api/facts/search")
                 .expect(400);
 
-            expect(response.body.message).toBe("At least one search parameter (e.g., 'animal') is required");
+            expect(response.body.message).toBe(
+                "At least one search parameter (e.g., 'animal') is required"
+            );
         });
 
         it("should return 400 when empty animal parameter provided", async () => {
             mockSearchFacts.mockImplementation((req, res) => {
                 res.status(400).json({
-                    message: "At least one search parameter (e.g., 'animal') is required",
+                    message:
+                        "At least one search parameter (e.g., 'animal') is required",
                 });
             });
 
-            await request(app)
-                .get("/api/facts/search?animal=")
-                .expect(400);
+            await request(app).get("/api/facts/search?animal=").expect(400);
 
-            await request(app)
-                .get("/api/facts/search?animal=   ")
-                .expect(400);
+            await request(app).get("/api/facts/search?animal=   ").expect(400);
         });
 
         it("should return empty results when no matches found", async () => {
