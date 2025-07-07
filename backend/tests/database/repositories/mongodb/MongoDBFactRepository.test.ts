@@ -98,15 +98,10 @@ describe("MongoDBFactRepository Search & findAll", () => {
             });
             // Advance time by 100ms to ensure different timestamps
             vi.advanceTimersByTime(100);
-
-            console.log("fact debug: ", {
-                created: created,
-                fact: fact,
-            });
         }
     });
 
-    afterEach(async () => {
+    afterEach( () => {
         vi.useRealTimers();
     });
 
