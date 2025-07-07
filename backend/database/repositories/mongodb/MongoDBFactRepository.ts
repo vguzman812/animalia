@@ -33,29 +33,19 @@ export class MongoDBFactRepository implements IFactRepository {
     }
 
     async findAll(
-        options: PaginationOptions & { keyword?: string } = {}
+        options: PaginationOptions = {}
     ): Promise<IPaginatedResult<IFact>> {
         try {
             const page = options.page ?? 1;
             const limit = options.limit ?? 10;
             const skip = (page - 1) * limit;
 
-            let query = {};
-            if (options.keyword) {
-                query = {
-                    animal: {
-                        $regex: options.keyword,
-                        $options: "i",
-                    },
-                };
-            }
-
             const [facts, total] = await Promise.all([
-                MongoFact.find(query)
+                MongoFact.find()
                     .skip(skip)
                     .limit(limit)
                     .sort({ createdAt: -1 }),
-                MongoFact.countDocuments(query),
+                MongoFact.countDocuments(),
             ]);
 
             return {
@@ -95,6 +85,51 @@ export class MongoDBFactRepository implements IFactRepository {
             };
         } catch (error) {
             console.error("Error finding facts by user id:", error);
+            throw error;
+        }
+    }
+
+    async search(
+        animal: string,
+        options: PaginationOptions = {}
+    ): Promise<IPaginatedResult<IFact>> {
+        try {
+            const page = options.page ?? 1;
+            const limit = options.limit ?? 10;
+            const skip = (page - 1) * limit;
+
+            // Create a regex pattern that removes all punctuation and special characters
+            // This allows flexible matching like "l.i.o.n" to match "African Lion"
+            const sanitized = animal.replace(/[^a-zA-Z0-9 ]/g, "");
+            if (!sanitized.trim()) {
+                // you could also throw here, but controller handles bad-request
+                return { data: [], page, pages: 0, total: 0 };
+            }
+            const regex = new RegExp(sanitized, "i");
+
+            const query = {
+                animal: {
+                    $regex: regex,
+                    $options: "i",
+                },
+            };
+
+            const [facts, total] = await Promise.all([
+                MongoFact.find(query).skip(skip).limit(limit).sort({
+                    animal: 1, // Alphabetical first (A-Z)
+                    createdAt: -1, // Then by creation date descending
+                }),
+                MongoFact.countDocuments(query),
+            ]);
+
+            return {
+                data: facts.map((fact) => this.convertToFact(fact)),
+                page,
+                pages: Math.ceil(total / limit),
+                total,
+            };
+        } catch (error) {
+            console.error("Error searching facts:", error);
             throw error;
         }
     }

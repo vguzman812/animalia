@@ -8,6 +8,7 @@ import {
     getTopFacts,
     likeFact,
     updateFact,
+    searchFacts,
 } from "../controllers/factController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import asyncHandler from "../middleware/asyncHandler.js";
@@ -17,6 +18,10 @@ const router = express.Router();
 // Route to get all facts
 // Access: Public
 router.route("/").get(asyncHandler(getFacts));
+
+// Route to search for facts by animal name
+// Access: Public
+router.route("/search").get(asyncHandler(searchFacts));
 
 // Route to create a new fact
 // Access: Private (only authenticated users)
