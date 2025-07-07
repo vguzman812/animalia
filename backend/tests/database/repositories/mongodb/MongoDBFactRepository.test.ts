@@ -9,14 +9,15 @@ import {
 } from "vitest";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import { MongoDBFactRepository } from "../../../../database/repositories/mongodb/MongoDBFactRepository";
-import { MongoFact } from "../../../../database/models/mongodb/factModel";
-import type { IFact } from "../../../../types/index";
+import { MongoDBFactRepository } from "../../../../database/repositories/mongodb/MongoDBFactRepository.ts";
+import { MongoFact } from "../../../../database/models/mongodb/factModel.ts";
+import type { IFact } from "../../../../types/index.ts";
 
 describe("MongoDBFactRepository Search & findAll", () => {
     let mongoServer: MongoMemoryServer;
     let repository: MongoDBFactRepository;
     let sampleFacts: IFact[];
+    let testUserId: string;
 
     beforeAll(async () => {
         mongoServer = await MongoMemoryServer.create();
@@ -35,13 +36,17 @@ describe("MongoDBFactRepository Search & findAll", () => {
         // clear collection
         await MongoFact.deleteMany({});
 
+        // Generate a valid ObjectId for testing
+
+        testUserId = new mongoose.Types.ObjectId().toString();
+
         sampleFacts = [
             {
                 id: "",
                 animal: "African Lion",
                 text: "Lions are powerful predators",
                 source: "test",
-                userId: "user1",
+                userId: testUserId,
                 likes: [],
                 createdAt: new Date("2023-01-01"),
                 updatedAt: new Date("2023-01-01"),
@@ -51,7 +56,7 @@ describe("MongoDBFactRepository Search & findAll", () => {
                 animal: "Mountain Lion",
                 text: "Mountain lions are solitary cats",
                 source: "test",
-                userId: "user1",
+                userId: testUserId,
                 likes: [],
                 createdAt: new Date("2023-01-02"),
                 updatedAt: new Date("2023-01-02"),
@@ -61,7 +66,7 @@ describe("MongoDBFactRepository Search & findAll", () => {
                 animal: "Elephant",
                 text: "Elephants have excellent memory",
                 source: "test",
-                userId: "user1",
+                userId: testUserId,
                 likes: [],
                 createdAt: new Date("2023-01-03"),
                 updatedAt: new Date("2023-01-03"),
@@ -71,7 +76,7 @@ describe("MongoDBFactRepository Search & findAll", () => {
                 animal: "African Lion",
                 text: "Another lion fact",
                 source: "test",
-                userId: "user1",
+                userId: testUserId,
                 likes: [],
                 createdAt: new Date("2023-01-04"),
                 updatedAt: new Date("2023-01-04"),
@@ -134,10 +139,10 @@ describe("MongoDBFactRepository Search & findAll", () => {
                     "{}[]|;lion",
                     "lion:<>/?~`",
                 ];
-                const clean = await repository.searchByAnimal("lion");
+                const clean = await repository.search("lion");
 
                 for (const term of variants) {
-                    const dusty = await repository.searchByAnimal(term);
+                    const dusty = await repository.search(term);
 
                     // same number of hits
                     expect(dusty.data).toHaveLength(clean.data.length);
@@ -171,12 +176,12 @@ describe("MongoDBFactRepository Search & findAll", () => {
             });
 
             it("should trim whitespace", async () => {
-                const res = await repository.searchByAnimal("  lion  ");
+                const res = await repository.search("  lion  ");
                 expect(res.data).toHaveLength(3);
             });
 
             it("should allow for spaces between words", async () => {
-                const res = await repository.searchByAnimal("mountain lion");
+                const res = await repository.search("mountain lion");
                 expect(res.data).toHaveLength(1);
                 expect(res.data[0].animal).toBe("Mountain Lion");
             });
@@ -208,7 +213,7 @@ describe("MongoDBFactRepository Search & findAll", () => {
 
             it("should handle very long search terms", async () => {
                 const longTerm = "lion".repeat(100);
-                const res = await repository.searchByAnimal(longTerm);
+                const res = await repository.search(longTerm);
                 expect(res.data).toHaveLength(0);
             });
         });
@@ -240,7 +245,7 @@ describe("MongoDBFactRepository Search & findAll", () => {
 
         describe("pagination", () => {
             it("should limit number of results per page", async () => {
-                const res = await repository.searchByAnimal("lion", {
+                const res = await repository.search("lion", {
                     limit: 2,
                 });
                 expect(res.data).toHaveLength(2);
@@ -249,7 +254,7 @@ describe("MongoDBFactRepository Search & findAll", () => {
             });
 
             it("should handle pagination options", async () => {
-                const res = await repository.searchByAnimal("lion", {
+                const res = await repository.search("lion", {
                     page: 2,
                     limit: 2,
                 });
@@ -272,7 +277,7 @@ describe("MongoDBFactRepository Search & findAll", () => {
             });
 
             it("should return an empty array if page is beyond range", async () => {
-                const res = await repository.searchByAnimal("lion", {
+                const res = await repository.search("lion", {
                     page: 10,
                     limit: 1,
                 });
@@ -348,9 +353,9 @@ describe("MongoDBFactRepository Search & findAll", () => {
         });
 
         it("should ignore keyword while paginating and sorting properly", async () => {
-            // @ts-ignore
             const page1 = await repository.findAll({
                 limit: 2,
+                // @ts-ignore
                 keyword: "lion",
             });
             expect(page1.total).toBe(4);
@@ -361,10 +366,10 @@ describe("MongoDBFactRepository Search & findAll", () => {
                 page1.data[1].createdAt.getTime()
             );
 
-            // @ts-ignore
             const page2 = await repository.findAll({
                 page: 2,
                 limit: 2,
+                // @ts-ignore
                 keyword: "elephant",
             });
             expect(page2.page).toBe(2);
