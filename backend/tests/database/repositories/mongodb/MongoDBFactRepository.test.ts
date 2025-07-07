@@ -6,6 +6,7 @@ import {
     afterAll,
     beforeEach,
     afterEach,
+    vi
 } from "vitest";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
@@ -32,6 +33,8 @@ describe("MongoDBFactRepository Search & findAll", () => {
     });
 
     beforeEach(async () => {
+        vi.useFakeTimers();
+
         repository = new MongoDBFactRepository();
         // clear collection
         await MongoFact.deleteMany({});
@@ -48,8 +51,8 @@ describe("MongoDBFactRepository Search & findAll", () => {
                 source: "test",
                 userId: testUserId,
                 likes: [],
-                createdAt: new Date("2023-01-01"),
-                updatedAt: new Date("2023-01-01"),
+                createdAt: new Date(),
+                updatedAt: new Date(),
             },
             {
                 id: "",
@@ -58,8 +61,8 @@ describe("MongoDBFactRepository Search & findAll", () => {
                 source: "test",
                 userId: testUserId,
                 likes: [],
-                createdAt: new Date("2023-01-02"),
-                updatedAt: new Date("2023-01-02"),
+                createdAt: new Date(),
+                updatedAt: new Date(),
             },
             {
                 id: "",
@@ -68,8 +71,8 @@ describe("MongoDBFactRepository Search & findAll", () => {
                 source: "test",
                 userId: testUserId,
                 likes: [],
-                createdAt: new Date("2023-01-03"),
-                updatedAt: new Date("2023-01-03"),
+                createdAt: new Date(),
+                updatedAt: new Date(),
             },
             {
                 id: "",
@@ -78,8 +81,8 @@ describe("MongoDBFactRepository Search & findAll", () => {
                 source: "test",
                 userId: testUserId,
                 likes: [],
-                createdAt: new Date("2023-01-04"),
-                updatedAt: new Date("2023-01-04"),
+                createdAt: new Date(),
+                updatedAt: new Date(),
             },
         ];
 
@@ -93,13 +96,18 @@ describe("MongoDBFactRepository Search & findAll", () => {
                 media: fact.media,
                 wiki: fact.wiki,
             });
-            // override timestamps so sorting tests are deterministic
-            await MongoFact.findByIdAndUpdate(
-                created.id,
-                { createdAt: fact.createdAt, updatedAt: fact.updatedAt },
-                { new: true, timestamps: false }
-            );
+            // Advance time by 100ms to ensure different timestamps
+            vi.advanceTimersByTime(100);
+
+            console.log("fact debug: ", {
+                created: created,
+                fact: fact,
+            });
         }
+    });
+
+    afterEach(async () => {
+        vi.useRealTimers();
     });
 
     describe("search method", () => {
@@ -305,6 +313,7 @@ describe("MongoDBFactRepository Search & findAll", () => {
 
         it("should sort results by creation date desc", async () => {
             const result = await repository.findAll({});
+            console.log('result :>> ', result);
 
             expect(result.data).toHaveLength(4);
             expect(result.data[0].createdAt.getTime()).toBeGreaterThan(
