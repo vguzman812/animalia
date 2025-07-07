@@ -29,6 +29,7 @@ describe("Fact Routes", () => {
 
     describe("GET /api/facts/search", () => {
         it("should call searchFacts controller", async () => {
+            /** Test that the search route properly delegates to the searchFacts controller function */
             vi.mocked(factController.searchFacts).mockImplementation(
                 (req: Request, res: Response) => {
                     res.status(200).json({ facts: [] });

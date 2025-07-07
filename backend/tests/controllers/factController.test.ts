@@ -65,6 +65,7 @@ describe("Fact Controller", () => {
 
     describe("getFacts", () => {
         it("should ignore keyword query parameter", async () => {
+            // Test that getFacts ignores the keyword parameter and uses default pagination
             mockRequest.query = { keyword: "lion" };
             const mockResult: IPaginatedResult<IFact> = {
                 data: [],
@@ -84,6 +85,7 @@ describe("Fact Controller", () => {
         });
 
         it("should paginate correctly", async () => {
+            // Test that getFacts properly handles pageNumber query parameter for pagination
             mockRequest.query = { pageNumber: "2" };
             const mockResult: IPaginatedResult<IFact> = {
                 data: [],
@@ -105,6 +107,7 @@ describe("Fact Controller", () => {
 
     describe("searchFacts", () => {
         it("should take animal as query parameter", async () => {
+            /** Test that searchFacts accepts and uses the animal query parameter */
             mockRequest.query = { animal: "Tiger" };
             const mockResult: IPaginatedResult<IFact> = {
                 data: [],
@@ -124,6 +127,7 @@ describe("Fact Controller", () => {
         });
 
         it("should return 400 and message when no animal parameter provided", async () => {
+            /** Test that searchFacts returns 400 error when required animal parameter is missing and that the specified message is included */
             mockRequest.query = {};
 
             await searchFacts(mockRequest as Request, mockResponse as Response);
@@ -136,6 +140,7 @@ describe("Fact Controller", () => {
         });
 
         it("should call search method from fact repository", async () => {
+            /** Test that searchFacts calls the search method on the fact repository */
             mockRequest.query = { animal: "Lion" };
             const mockResult: IPaginatedResult<IFact> = {
                 data: [],
@@ -152,6 +157,7 @@ describe("Fact Controller", () => {
         });
 
         it("should call search method with animal and pagination options", async () => {
+            /** Test that searchFacts passes correct animal name and pagination options to the search method */
             mockRequest.query = { animal: "Elephant", pageNumber: "2" };
             const mockResult: IPaginatedResult<IFact> = {
                 data: [],
@@ -171,6 +177,7 @@ describe("Fact Controller", () => {
         });
 
         it("should return 200 when animal parameter is provided", async () => {
+            /** Test that searchFacts returns success when necessary query param is provided */
             mockRequest.query = { animal: "Bear" };
             const mockResult: IPaginatedResult<IFact> = {
                 data: [],
