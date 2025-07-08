@@ -9,6 +9,10 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
+# Set MongoDB version to 4.4 to avoid AVX requirement
+ENV MONGOMS_VERSION=4.4.18
+
 COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
