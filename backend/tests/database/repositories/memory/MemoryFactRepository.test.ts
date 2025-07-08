@@ -79,7 +79,7 @@ describe("MemoryFactRepository Search Functionality", () => {
         describe("matching", () => {
             it("should find facts by exact animal name match", async () => {
                 /** Test that search finds facts when given query matches animal name exactly */
-                const result = await repository.search("Elephant");
+                const result = await repository.search({animal: "Elephant"});
 
                 expect(result.data).toHaveLength(1);
                 expect(result.data[0].animal).toBe("Elephant");
@@ -87,7 +87,7 @@ describe("MemoryFactRepository Search Functionality", () => {
 
             it("should find facts by case-insensitive search", async () => {
                 /** Test that search ignores case differences in animal names */
-                const result = await repository.search("ELEPHANT");
+                const result = await repository.search({animal: "ELEPHANT"});
 
                 expect(result.data).toHaveLength(1);
                 expect(result.data[0].animal).toBe("Elephant");
@@ -95,7 +95,7 @@ describe("MemoryFactRepository Search Functionality", () => {
 
             it("should find facts by partial substring match", async () => {
                 /** Test that search matches animal names with only partial substrings (assumes case-insensitivity)s */
-                const result = await repository.search("li");
+                const result = await repository.search({animal: "li"});
 
                 expect(result.data).toHaveLength(3);
                 expect(
@@ -111,7 +111,7 @@ describe("MemoryFactRepository Search Functionality", () => {
 
             it("should return empty results for non-matching search", async () => {
                 // Test that the search doesn't return irrelevant results
-                const result = await repository.search("tiger");
+                const result = await repository.search({animal: "tiger"});
 
                 expect(result.data).toHaveLength(0);
                 expect(result.total).toBe(0);
@@ -120,11 +120,11 @@ describe("MemoryFactRepository Search Functionality", () => {
 
             it("should normalize/remove punctuation and special characters", async () => {
                 /** Test that punctuation and special characters are removed/ignored. */
-                const result1 = await repository.search("l.i.o.n");
-                const result2 = await repository.search("l-ion");
-                const result3 = await repository.search("l,io,n");
-                const result4 = await repository.search("l!@#$%ion");
-                const result5 = await repository.search("l_i_o_n");
+                const result1 = await repository.search({animal: "l.i.o.n"});
+                const result2 = await repository.search({animal: "l-ion"});
+                const result3 = await repository.search({animal: "l,io,n"});
+                const result4 = await repository.search({animal: "l!@#$%ion"});
+                const result5 = await repository.search({animal: "l_i_o_n"});
 
                 expect(result1.data).toHaveLength(3);
                 expect(result2.data).toHaveLength(3);
@@ -154,8 +154,8 @@ describe("MemoryFactRepository Search Functionality", () => {
 
                 for (const { variant, normalized } of cases) {
                     const [cleanRes, dirtyRes] = await Promise.all([
-                        repository.search(normalized),
-                        repository.search(variant),
+                        repository.search({animal: normalized}),
+                        repository.search({animal: variant}),
                     ]);
 
                     expect(dirtyRes.data).toHaveLength(cleanRes.data.length);
@@ -169,14 +169,14 @@ describe("MemoryFactRepository Search Functionality", () => {
 
             it("should trim whitespace", async () => {
                 /** Test that search ignores leading and trailing whitespace */
-                const result = await repository.search("  lion  ");
+                const result = await repository.search({animal: "  lion  "});
 
                 expect(result.data).toHaveLength(3);
             });
 
             it("should allow for spaces between words", async () => {
                 /** Test that search handles multi-word animal names with spaces */
-                const result = await repository.search("mountain lion");
+                const result = await repository.search({animal: "mountain lion"});
 
                 expect(result.data).toHaveLength(1);
                 expect(result.data[0].animal).toBe("Mountain Lion");
@@ -184,7 +184,7 @@ describe("MemoryFactRepository Search Functionality", () => {
 
             it("should trim whitespace but allow for spaces between words", async () => {
                 /** Test that search trims external whitespace while preserving internal spaces */
-                const result = await repository.search("  mountain lion  ");
+                const result = await repository.search({animal: "  mountain lion  "});
 
                 expect(result.data).toHaveLength(1);
                 expect(result.data[0].animal).toBe("Mountain Lion");
@@ -192,7 +192,7 @@ describe("MemoryFactRepository Search Functionality", () => {
 
             it("should allow for multiple spaces between words", async () => {
                 /** Test that search normalizes multiple consecutive spaces to single spaces */
-                const result = await repository.search("mountain    lion");
+                const result = await repository.search({animal: "mountain    lion"});
 
                 expect(result.data).toHaveLength(1);
                 expect(result.data[0].animal).toBe("Mountain Lion");
@@ -200,14 +200,14 @@ describe("MemoryFactRepository Search Functionality", () => {
 
             it("should not match concatenated animal names without spaces", async () => {
                 /** Test that search requires spacing between words in multi-word names */
-                const result = await repository.search("mountainlion");
+                const result = await repository.search({animal: "mountainlion"});
 
                 expect(result.data).toHaveLength(0);
             });
 
             it("should handle empty animal parameter", async () => {
                 /** Test that search returns empty results for empty search strings */
-                const result = await repository.search("");
+                const result = await repository.search({animal: ""});
 
                 expect(result.data).toHaveLength(0);
             });
@@ -215,14 +215,14 @@ describe("MemoryFactRepository Search Functionality", () => {
             it("should handle very long search terms", async () => {
                 // test that partial substrings of a relevant animal ('lion') do not return false-positives in extremely long search terms
                 const longTerm = "lion".repeat(100);
-                const result = await repository.search(longTerm);
+                const result = await repository.search({animal: longTerm});
 
                 expect(result.data).toHaveLength(0);
             });
 
             it("treats whitespace-only terms as invalid", async () => {
                 // Test that whitespace-only terms are invalid
-                const result = await repository.search("   ");
+                const result = await repository.search({animal: "   "});
 
                 expect(result.data).toHaveLength(0);
             });
@@ -231,7 +231,7 @@ describe("MemoryFactRepository Search Functionality", () => {
         describe("sorting", () => {
             it("should sort results alphabetically A -> Z by name", async () => {
                 /** Test that search results are sorted alphabetically by animal name */
-                const result = await repository.search("lion");
+                const result = await repository.search({animal: "lion"});
 
                 expect(result.data).toHaveLength(3);
                 expect(result.data[0].animal).toBe("African Lion");
@@ -240,7 +240,7 @@ describe("MemoryFactRepository Search Functionality", () => {
             });
             it("should sort by createdAt desc for same-named animals", async () => {
                 /** Test that facts with same animal name are sorted by creation date (newest first) */
-                const result = await repository.search("lion");
+                const result = await repository.search({animal: "lion"});
 
                 expect(result.data).toHaveLength(3);
                 expect(result.data[0].animal).toBe("African Lion");
@@ -256,7 +256,7 @@ describe("MemoryFactRepository Search Functionality", () => {
         describe("pagination", () => {
             it("should limit number of results per page", async () => {
                 // Test that we can limit the number of results per page
-                const result = await repository.search("lion", {
+                const result = await repository.search( {animal: "lion",
                     limit: 2,
                 });
 
@@ -267,7 +267,7 @@ describe("MemoryFactRepository Search Functionality", () => {
 
             it("should handle pagination options", async () => {
                 /** Test that search correctly implements page navigation */
-                const result = await repository.search("lion", {
+                const result = await repository.search( {animal: "lion",
                     page: 2,
                     limit: 2,
                 });
@@ -280,7 +280,7 @@ describe("MemoryFactRepository Search Functionality", () => {
 
             it("should sort results while paginating", async () => {
                 /** Test that search maintains proper sorting across paginated results */
-                const result = await repository.search("lion", {
+                const result = await repository.search( {animal: "lion",
                     page: 2,
                     limit: 2,
                 });
@@ -294,7 +294,7 @@ describe("MemoryFactRepository Search Functionality", () => {
 
             it("should return an empty array if page is beyond range", async () => {
                 /** Test that search handles requests for pages beyond available data */
-                const result = await repository.search("lion", {
+                const result = await repository.search( {animal: "lion",
                     page: 10,
                     limit: 1,
                 });

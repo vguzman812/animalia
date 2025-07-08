@@ -120,7 +120,8 @@ describe("Fact Controller", () => {
 
             await searchFacts(mockRequest as Request, mockResponse as Response);
 
-            expect(mockFactRepository.search).toHaveBeenCalledWith("Tiger", {
+            expect(mockFactRepository.search).toHaveBeenCalledWith({
+                animal: "Tiger",
                 page: 1,
                 limit: 10,
             });
@@ -130,13 +131,12 @@ describe("Fact Controller", () => {
             /** Test that searchFacts returns 400 error when required animal parameter is missing and that the specified message is included */
             mockRequest.query = {};
 
-            await searchFacts(mockRequest as Request, mockResponse as Response);
-
+            await expect(
+                searchFacts(mockRequest as Request, mockResponse as Response)
+            ).rejects.toThrow(
+                "At least one search parameter (e.g., 'animal') is required"
+            );
             expect(mockResponse.status).toHaveBeenCalledWith(400);
-            expect(mockResponse.json).toHaveBeenCalledWith({
-                message:
-                    "At least one search parameter (e.g., 'animal') is required",
-            });
         });
 
         it("should call search method from fact repository", async () => {
@@ -170,7 +170,8 @@ describe("Fact Controller", () => {
 
             await searchFacts(mockRequest as Request, mockResponse as Response);
 
-            expect(mockFactRepository.search).toHaveBeenCalledWith("Elephant", {
+            expect(mockFactRepository.search).toHaveBeenCalledWith({
+                animal: "Elephant",
                 page: 2,
                 limit: 10,
             });
