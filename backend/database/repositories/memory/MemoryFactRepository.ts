@@ -15,22 +15,13 @@ export class MemoryFactRepository implements IFactRepository {
     }
 
     async findAll(
-        options: PaginationOptions & { keyword?: string } = {}
+        options: PaginationOptions = {}
     ): Promise<IPaginatedResult<IFact>> {
         const page = options.page ?? 1;
         const limit = options.limit ?? 10;
         const offset = (page - 1) * limit;
 
-        let allFacts = Array.from(this.facts.values());
-
-        // Apply keyword filter if provided
-        if (options.keyword) {
-            allFacts = allFacts.filter((fact) =>
-                fact.animal
-                    .toLowerCase()
-                    .includes(options.keyword!.toLowerCase())
-            );
-        }
+        const allFacts = Array.from(this.facts.values());
 
         // Sort by creation date (newest first)
         allFacts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
@@ -42,6 +33,104 @@ export class MemoryFactRepository implements IFactRepository {
             page,
             pages: Math.ceil(allFacts.length / limit),
             total: allFacts.length,
+        });
+    }
+
+    async search(
+        options: PaginationOptions & { animal: string }
+    ): Promise<IPaginatedResult<IFact>> {
+        const page = options.page ?? 1;
+        const limit = options.limit ?? 10;
+        const offset = (page - 1) * limit;
+
+        // Handle empty or whitespace-only search terms
+        const trimmedAnimal = options.animal.trim();
+        if (!trimmedAnimal) {
+            return Promise.resolve({
+                data: [],
+                page,
+                pages: 0,
+                total: 0,
+            });
+        }
+
+        // Normalize search term: remove diacritics and special characters
+        const normalizedSearch = trimmedAnimal
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+            .replace(/[^a-zA-Z0-9\s]/g, "") // Remove punctuation completely (only keep letters, numbers, and spaces)
+            .replace(/\s+/g, " ") // Normalize multiple spaces to single space
+            .trim();
+
+        if (!normalizedSearch) {
+            return Promise.resolve({
+                data: [],
+                page,
+                pages: 0,
+                total: 0,
+            });
+        }
+
+        // Split into words and create search pattern
+        const searchWords = normalizedSearch
+            .split(/\s+/)
+            .filter((word) => word.length > 0);
+
+        if (searchWords.length === 0) {
+            return Promise.resolve({
+                data: [],
+                page,
+                pages: 0,
+                total: 0,
+            });
+        }
+
+        let searchPattern: string;
+        if (searchWords.length === 1) {
+            // Single word - should match as substring
+            searchPattern = searchWords[0].toLowerCase();
+        } else {
+            // Multi-word search - words must appear in sequence with spaces between them
+            searchPattern = searchWords.join("\\s+");
+        }
+
+        // Filter facts by normalized animal name
+        const filteredFacts = Array.from(this.facts.values()).filter((fact) => {
+            const normalizedFactAnimal = fact.animal
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+                .replace(/[^a-zA-Z0-9\s]/g, "") // Remove punctuation completely
+                .replace(/\s+/g, " ") // Normalize multiple spaces to single space
+                .trim()
+                .toLowerCase();
+
+            if (searchWords.length === 1) {
+                return normalizedFactAnimal.includes(searchPattern);
+            } else {
+                // For multi-word search, use regex pattern
+                const regex = new RegExp(searchPattern, "i");
+                return regex.test(normalizedFactAnimal);
+            }
+        });
+
+        // Sort alphabetically by animal name (A-Z), then by creation date (newest first)
+        filteredFacts.sort((a, b) => {
+            const animalComparison = a.animal.localeCompare(b.animal);
+            if (animalComparison !== 0) {
+                return animalComparison;
+            }
+            return b.createdAt.getTime() - a.createdAt.getTime();
+        });
+
+        const data = filteredFacts.slice(offset, offset + limit);
+        const total = filteredFacts.length;
+        const pages = total ? Math.ceil(total / limit) : 0;
+
+        return Promise.resolve({
+            data,
+            page,
+            pages,
+            total,
         });
     }
 

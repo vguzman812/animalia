@@ -10,13 +10,41 @@ import type { IAuthRequest, IFact } from "../types/index.js";
 const getFacts = async (req: Request, res: Response) => {
     const pageSize = Number(process.env.PAGINATION_LIMIT) || 10;
     const page = Number(req.query.pageNumber) || 1;
-    const keyword = req.query.keyword as string;
 
     const factRepository = DatabaseManager.getInstance().getFactRepository();
     const result = await factRepository.findAll({
         page,
         limit: pageSize,
-        keyword,
+    });
+
+    res.status(200).json({
+        facts: result.data,
+        page: result.page,
+        pages: result.pages,
+    });
+};
+
+/**
+ * @description Search facts by animal name
+ * @route       GET /api/facts/search
+ * @access      Public
+ */
+const searchFacts = async (req: Request, res: Response) => {
+    const pageSize = Number(process.env.PAGINATION_LIMIT) || 10;
+    const page = Number(req.query.pageNumber) || 1;
+    const animal = req.query.animal as string;
+
+    // Validate that at least one search parameter is provided
+    if (!animal || animal.trim() === "") {
+        res.status(400)
+        throw new Error("At least one search parameter (e.g., 'animal') is required");
+    }
+
+    const factRepository = DatabaseManager.getInstance().getFactRepository();
+    const result = await factRepository.search({
+        animal,
+        page,
+        limit: pageSize,
     });
 
     res.status(200).json({
@@ -225,4 +253,5 @@ export {
     deleteFact,
     likeFact,
     getTopFacts,
+    searchFacts,
 };

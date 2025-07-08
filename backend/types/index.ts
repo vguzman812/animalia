@@ -89,12 +89,13 @@ export interface IUserRepository {
 
 export interface IFactRepository {
     findById(id: string): Promise<IFact | null>;
-    findAll(
-        options?: PaginationOptions & { keyword?: string }
-    ): Promise<IPaginatedResult<IFact>>;
+    findAll(options?: PaginationOptions): Promise<IPaginatedResult<IFact>>;
     findByUserId(
         userId: string,
         options?: PaginationOptions
+    ): Promise<IPaginatedResult<IFact>>;
+    search(
+        options?: PaginationOptions & { animal: string }
     ): Promise<IPaginatedResult<IFact>>;
     create(
         factData: Omit<IFact, "id" | "createdAt" | "updatedAt">

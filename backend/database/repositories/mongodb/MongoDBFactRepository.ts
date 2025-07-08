@@ -33,29 +33,19 @@ export class MongoDBFactRepository implements IFactRepository {
     }
 
     async findAll(
-        options: PaginationOptions & { keyword?: string } = {}
+        options: PaginationOptions = {}
     ): Promise<IPaginatedResult<IFact>> {
         try {
             const page = options.page ?? 1;
             const limit = options.limit ?? 10;
             const skip = (page - 1) * limit;
 
-            let query = {};
-            if (options.keyword) {
-                query = {
-                    animal: {
-                        $regex: options.keyword,
-                        $options: "i",
-                    },
-                };
-            }
-
             const [facts, total] = await Promise.all([
-                MongoFact.find(query)
+                MongoFact.find()
                     .skip(skip)
                     .limit(limit)
                     .sort({ createdAt: -1 }),
-                MongoFact.countDocuments(query),
+                MongoFact.countDocuments(),
             ]);
 
             return {
@@ -95,6 +85,94 @@ export class MongoDBFactRepository implements IFactRepository {
             };
         } catch (error) {
             console.error("Error finding facts by user id:", error);
+            throw error;
+        }
+    }
+
+    async search(
+        options: PaginationOptions & { animal: string }
+    ): Promise<IPaginatedResult<IFact>> {
+        try {
+            const page = options.page ?? 1;
+            const limit = options.limit ?? 10;
+            const skip = (page - 1) * limit;
+
+            // Handle empty or whitespace-only search terms
+            const trimmedAnimal = options.animal.trim();
+            if (!trimmedAnimal) {
+                return {
+                    data: [],
+                    page,
+                    pages: 0,
+                    total: 0,
+                };
+            }
+
+            // Normalize search term: remove diacritcs and special characters
+            const normalizedSearch = trimmedAnimal
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+                .replace(/[^a-zA-Z0-9\s]/g, "") // Remove punctuation completely (only keep letters, numbers, and spaces)
+                .replace(/\s+/g, " ") // Normalize multiple spaces to single space
+                .trim();
+
+            if (!normalizedSearch) {
+                return {
+                    data: [],
+                    page,
+                    pages: 0,
+                    total: 0,
+                };
+            }
+
+            // Split into words and handle differently based on word count
+            const searchWords = normalizedSearch
+                .split(/\s+/)
+                .filter((word) => word.length > 0);
+
+            if (searchWords.length === 0) {
+                return {
+                    data: [],
+                    page,
+                    pages: 0,
+                    total: 0,
+                };
+            }
+
+            let regexPattern: string;
+            if (searchWords.length === 1) {
+                // Single word - should match as substring but respect word boundaries
+                const word = searchWords[0];
+                regexPattern = word;
+            } else {
+                // Multi-word search - words must appear in sequence with actual spaces between them
+                regexPattern = searchWords.join("\\s+");
+            }
+
+            // Create the MongoDB query
+            const query = {
+                animal: {
+                    $regex: regexPattern,
+                    $options: "i",
+                },
+            };
+
+            const [facts, total] = await Promise.all([
+                MongoFact.find(query).skip(skip).limit(limit).sort({
+                    animal: 1, // Alphabetical first (A-Z)
+                    createdAt: -1, // Then by creation date descending
+                }),
+                MongoFact.countDocuments(query),
+            ]);
+
+            return {
+                data: facts.map((fact) => this.convertToFact(fact)),
+                page,
+                pages: Math.ceil(total / limit),
+                total,
+            };
+        } catch (error) {
+            console.error("Error searching facts:", error);
             throw error;
         }
     }
