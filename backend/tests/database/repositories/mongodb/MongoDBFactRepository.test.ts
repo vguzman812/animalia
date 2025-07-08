@@ -21,11 +21,7 @@ describe("MongoDBFactRepository Search & findAll", () => {
     let testUserId: string;
 
     beforeAll(async () => {
-        mongoServer = await MongoMemoryServer.create({
-            binary: {
-                version: "4.4.18",
-            },
-        });
+        mongoServer = await MongoMemoryServer.create();
         const mongoUri = mongoServer.getUri();
 
         await mongoose.connect(mongoUri);
