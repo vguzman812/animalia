@@ -346,7 +346,6 @@ describe("MongoDBFactRepository Search & findAll", () => {
         it("should sort results by creation date desc", async () => {
             /** Test that findAll sorts all facts by creation date in descending order */
             const result = await repository.findAll({});
-
             expect(result.data).toHaveLength(4);
             expect(result.data[0].createdAt.getTime()).toBeGreaterThan(
                 result.data[1].createdAt.getTime()
