@@ -1,3 +1,4 @@
+// /types/index.ts
 import type { Request } from "express";
 
 // Base entity interface
